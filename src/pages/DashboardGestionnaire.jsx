@@ -39,7 +39,7 @@ const BADGE_COLORS = {
   'en attente': { background: '#fff3cd', color: '#856404' },
   refusé:     { background: '#f8d7da', color: '#721c24' },
   ouvert:     { background: '#cce5ff', color: '#004085' },
-  en_cours:   { background: '#fff3cd', color: '#856404' },
+  'en cours': { background: '#fff3cd', color: '#856404' },
   résolu:     { background: '#d4edda', color: '#155724' },
   basse:      { background: '#e2e3e5', color: '#383d41' },
   normale:    { background: '#cce5ff', color: '#004085' },
@@ -326,8 +326,8 @@ function SectionPaiements() {
 
 // ─── Section Problèmes ────────────────────────────────────────────────────────
 
-const STATUTS_PROBLEME  = ['ouvert', 'en_cours', 'résolu'];
-const PRIORITES_PROBLEME = ['basse', 'normale', 'haute', 'urgente'];
+const STATUTS_PROBLEME  = ['ouvert', 'en cours', 'résolu'];
+const PRIORITES_PROBLEME = ['haute', 'normale', 'basse'];
 
 function SectionProblemes() {
   const [problemes, setProblemes] = useState([]);
@@ -352,7 +352,7 @@ function SectionProblemes() {
   async function handleUpdate(id, patch) {
     setError('');
     try {
-      await api.patch(`/api/problemes/${id}`, patch);
+      await api.put(`/api/problemes/${id}`, patch);
       setProblemes(prev => prev.map(p => p.id === id ? { ...p, ...patch } : p));
     } catch {
       setError('Erreur lors de la mise à jour.');
@@ -376,6 +376,7 @@ function SectionProblemes() {
             <tr>
               <th style={s.th}>Résident</th>
               <th style={s.th}>Titre</th>
+              <th style={s.th}>Description</th>
               <th style={s.th}>Statut</th>
               <th style={s.th}>Priorité</th>
               <th style={s.th}>Changer statut</th>
@@ -387,6 +388,7 @@ function SectionProblemes() {
               <tr key={p.id}>
                 <td style={s.td}>{p.resident?.nom ?? p.resident_nom ?? '—'}</td>
                 <td style={s.td}>{p.titre}</td>
+                <td style={{ ...s.td, maxWidth: 260, color: '#555' }}>{p.description ?? '—'}</td>
                 <td style={s.td}><Badge value={p.statut} /></td>
                 <td style={s.td}><Badge value={p.priorite} /></td>
                 <td style={s.td}>
