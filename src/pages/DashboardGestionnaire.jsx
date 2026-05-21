@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -535,6 +535,176 @@ function SectionAnnonces() {
   );
 }
 
+// ─── Section Messages ─────────────────────────────────────────────────────────
+
+function SectionMessages({ onRead }) {
+  const [messages, setMessages]   = useState([]);
+  const [loading, setLoading]     = useState(false);
+  const [error, setError]         = useState('');
+  const [selectedId, setSelectedId] = useState(null);
+  const [reply, setReply]         = useState('');
+  const [sending, setSending]     = useState(false);
+  const { user }                  = useAuth();
+  const bottomRef                 = useRef(null);
+
+  useEffect(() => { fetchMessages(); }, []);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [selectedId, messages]);
+
+  async function fetchMessages() {
+    setLoading(true);
+    setError('');
+    try {
+      const { data } = await api.get('/api/messages');
+      setMessages(data);
+      const unread = data.filter(m => !m.lu);
+      await Promise.all(unread.map(m => api.put(`/api/messages/${m.id}/lu`).catch(() => {})));
+      if (unread.length > 0) onRead?.();
+    } catch {
+      setError('Impossible de charger les messages.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleSend(e) {
+    e.preventDefault();
+    if (!reply.trim() || !selectedId) return;
+    setSending(true);
+    setError('');
+    try {
+      await api.post('/api/messages', { contenu: reply, destinataire_id: selectedId });
+      setReply('');
+      fetchMessages();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Erreur lors de l\'envoi.');
+    } finally {
+      setSending(false);
+    }
+  }
+
+  const conversations = [];
+  const seen = new Set();
+  [...messages]
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    .forEach(m => {
+      const otherId  = m.expediteur_id === user?.id ? m.destinataire_id  : m.expediteur_id;
+      const otherNom = m.expediteur_id === user?.id ? (m.destinataire_nom ?? '—') : (m.expediteur_nom ?? '—');
+      if (!seen.has(otherId)) {
+        seen.add(otherId);
+        const unread = messages.filter(msg => msg.expediteur_id === otherId && !msg.lu).length;
+        conversations.push({ id: otherId, nom: otherNom, unread, last: m });
+      }
+    });
+
+  const thread = selectedId
+    ? messages
+        .filter(m => m.expediteur_id === selectedId || m.destinataire_id === selectedId)
+        .sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+    : [];
+
+  return (
+    <div style={s.card}>
+      <div style={s.cardHead}>
+        <h2 style={s.h2}>Messages</h2>
+      </div>
+
+      {error   && <p style={s.error}>{error}</p>}
+      {loading && <p style={s.loading}>Chargement...</p>}
+
+      {!loading && (
+        <div style={{ display: 'flex', gap: 16, height: 460 }}>
+
+          {/* Liste des conversations */}
+          <div style={{ width: 220, borderRight: '1px solid #eee', overflowY: 'auto', paddingRight: 12, flexShrink: 0 }}>
+            {conversations.length === 0 && <p style={s.empty}>Aucun message.</p>}
+            {conversations.map(c => (
+              <div
+                key={c.id}
+                onClick={() => setSelectedId(c.id)}
+                style={{
+                  padding: '10px 8px', borderRadius: 6, cursor: 'pointer', marginBottom: 4,
+                  background: selectedId === c.id ? '#f0f2f5' : 'transparent',
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                }}
+              >
+                <div style={{ overflow: 'hidden' }}>
+                  <div style={{ fontWeight: c.unread > 0 ? '700' : '400', fontSize: 14 }}>{c.nom}</div>
+                  <div style={{ fontSize: 12, color: '#888', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {c.last.contenu.slice(0, 28)}{c.last.contenu.length > 28 ? '…' : ''}
+                  </div>
+                </div>
+                {c.unread > 0 && (
+                  <span style={{ background: '#dc3545', color: '#fff', borderRadius: 10, padding: '1px 7px', fontSize: 11, fontWeight: '700', flexShrink: 0, marginLeft: 6 }}>
+                    {c.unread}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Thread sélectionné */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+            {!selectedId && (
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <p style={s.empty}>Sélectionnez une conversation.</p>
+              </div>
+            )}
+            {selectedId && (
+              <>
+                <div style={{ flex: 1, overflowY: 'auto', paddingBottom: 8 }}>
+                  {thread.map(m => {
+                    const mine = m.expediteur_id === user?.id;
+                    return (
+                      <div key={m.id} style={{ display: 'flex', justifyContent: mine ? 'flex-end' : 'flex-start', marginBottom: 10 }}>
+                        <div style={{
+                          maxWidth: '70%',
+                          background: mine ? '#1a1a2e' : '#e9ecef',
+                          color: mine ? '#fff' : '#333',
+                          borderRadius: mine ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
+                          padding: '8px 12px', fontSize: 14,
+                        }}>
+                          {!mine && (
+                            <div style={{ fontSize: 11, fontWeight: '600', marginBottom: 3, opacity: 0.7 }}>
+                              {m.expediteur_nom ?? '—'}
+                            </div>
+                          )}
+                          <div style={{ whiteSpace: 'pre-wrap' }}>{m.contenu}</div>
+                          {m.created_at && (
+                            <div style={{ fontSize: 11, marginTop: 4, opacity: 0.6, textAlign: 'right' }}>
+                              {new Date(m.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  <div ref={bottomRef} />
+                </div>
+
+                <form onSubmit={handleSend} style={{ display: 'flex', gap: 8, paddingTop: 8, borderTop: '1px solid #eee' }}>
+                  <input
+                    style={{ ...s.input, flex: 1 }}
+                    placeholder="Répondre..."
+                    value={reply}
+                    onChange={e => setReply(e.target.value)}
+                  />
+                  <button type="submit" style={{ ...s.btn, ...s.btnPrimary, marginRight: 0 }} disabled={sending || !reply.trim()}>
+                    {sending ? '...' : 'Envoyer'}
+                  </button>
+                </form>
+              </>
+            )}
+          </div>
+
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Dashboard principal ──────────────────────────────────────────────────────
 
 const TABS = [
@@ -542,6 +712,7 @@ const TABS = [
   { key: 'paiements',  label: 'Paiements' },
   { key: 'problemes',  label: 'Problèmes' },
   { key: 'annonces',   label: 'Annonces'  },
+  { key: 'messages',   label: 'Messages'  },
 ];
 
 export default function DashboardGestionnaire() {
@@ -549,6 +720,13 @@ export default function DashboardGestionnaire() {
   const [activeTab, setActiveTab] = useState(
     () => localStorage.getItem('activeTab') || 'residents'
   );
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    api.get('/api/messages')
+      .then(({ data }) => setUnreadCount(data.filter(m => !m.lu).length))
+      .catch(() => {});
+  }, []);
 
   function handleTabChange(key) {
     localStorage.setItem('activeTab', key);
@@ -566,6 +744,11 @@ export default function DashboardGestionnaire() {
             onClick={() => handleTabChange(tab.key)}
           >
             {tab.label}
+            {tab.key === 'messages' && unreadCount > 0 && (
+              <span style={{ background: '#dc3545', color: '#fff', borderRadius: 10, padding: '1px 6px', fontSize: 11, fontWeight: '700', marginLeft: 6 }}>
+                {unreadCount}
+              </span>
+            )}
           </button>
         ))}
         <span style={s.navSep} />
@@ -578,6 +761,7 @@ export default function DashboardGestionnaire() {
         {activeTab === 'paiements'  && <SectionPaiements />}
         {activeTab === 'problemes'  && <SectionProblemes />}
         {activeTab === 'annonces'   && <SectionAnnonces />}
+        {activeTab === 'messages'   && <SectionMessages onRead={() => setUnreadCount(0)} />}
       </div>
     </div>
   );
