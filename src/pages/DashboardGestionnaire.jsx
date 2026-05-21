@@ -571,6 +571,7 @@ function SectionMessages({ onRead }) {
   const isMobile                  = useIsMobile();
   const bottomRef                 = useRef(null);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { fetchMessages(); }, []);
 
   useEffect(() => {
