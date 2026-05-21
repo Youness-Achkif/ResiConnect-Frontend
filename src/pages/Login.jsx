@@ -31,36 +31,56 @@ export default function Login() {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: '80px auto', padding: '0 16px' }}>
-      <h1>ResiConnect</h1>
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: 12 }}>
-          <label>Email</label>
-          <br />
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{ width: '100%', padding: 8, marginTop: 4 }}
-          />
-        </div>
-        <div style={{ marginBottom: 12 }}>
-          <label>Mot de passe</label>
-          <br />
-          <input
-            type="password"
-            value={motDePasse}
-            onChange={(e) => setMotDePasse(e.target.value)}
-            required
-            style={{ width: '100%', padding: 8, marginTop: 4 }}
-          />
-        </div>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <button type="submit" disabled={loading} style={{ width: '100%', padding: 10 }}>
-          {loading ? 'Connexion...' : 'Se connecter'}
-        </button>
-      </form>
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: '#f0f2f5',
+      padding: 16,
+      boxSizing: 'border-box',
+    }}>
+      <div style={{
+        width: '100%',
+        maxWidth: 400,
+        background: '#fff',
+        borderRadius: 8,
+        padding: 32,
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+        boxSizing: 'border-box',
+      }}>
+        <h2 style={{ margin: '0 0 24px', textAlign: 'center', fontFamily: 'sans-serif' }}>ResiConnect</h2>
+        <form onSubmit={handleSubmit}>
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ display: 'block', marginBottom: 6, fontSize: 14, fontWeight: '500', fontFamily: 'sans-serif' }}>Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              style={{ width: '100%', padding: '10px 12px', border: '1px solid #ccc', borderRadius: 4, fontSize: 14, boxSizing: 'border-box' }}
+            />
+          </div>
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ display: 'block', marginBottom: 6, fontSize: 14, fontWeight: '500', fontFamily: 'sans-serif' }}>Mot de passe</label>
+            <input
+              type="password"
+              value={motDePasse}
+              onChange={(e) => setMotDePasse(e.target.value)}
+              required
+              style={{ width: '100%', padding: '10px 12px', border: '1px solid #ccc', borderRadius: 4, fontSize: 14, boxSizing: 'border-box' }}
+            />
+          </div>
+          {error && <p style={{ color: '#dc3545', fontSize: 13, margin: '0 0 12px' }}>{error}</p>}
+          <button
+            type="submit"
+            disabled={loading}
+            style={{ width: '100%', padding: '12px', minHeight: 44, background: '#1a1a2e', color: '#fff', border: 'none', borderRadius: 4, fontSize: 15, fontWeight: '600', cursor: loading ? 'not-allowed' : 'pointer', fontFamily: 'sans-serif' }}
+          >
+            {loading ? 'Connexion...' : 'Se connecter'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

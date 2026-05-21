@@ -2,35 +2,50 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
+  return isMobile;
+}
+
 // ─── Styles (cohérent avec DashboardGestionnaire) ─────────────────────────────
 
 const s = {
-  page:       { fontFamily: 'sans-serif', minHeight: '100vh', background: '#f0f2f5' },
-  nav:        { background: '#16213e', color: '#fff', display: 'flex', alignItems: 'center', padding: '0 24px', gap: 8, height: 56, flexWrap: 'wrap' },
-  navTitle:   { fontWeight: 'bold', fontSize: 17, marginRight: 16 },
-  navSep:     { flex: 1 },
-  tab:        { background: 'none', border: '1px solid rgba(255,255,255,0.4)', color: '#ccc', padding: '5px 14px', cursor: 'pointer', borderRadius: 4, fontSize: 13 },
-  tabActive:  { background: '#fff', border: '1px solid #fff', color: '#16213e', padding: '5px 14px', cursor: 'pointer', borderRadius: 4, fontSize: 13, fontWeight: '600' },
-  subTab:     { background: 'none', border: '1px solid #ccc', color: '#555', padding: '4px 12px', cursor: 'pointer', borderRadius: 4, fontSize: 13, marginRight: 6 },
-  subTabActive: { background: '#16213e', border: '1px solid #16213e', color: '#fff', padding: '4px 12px', cursor: 'pointer', borderRadius: 4, fontSize: 13, marginRight: 6, fontWeight: '600' },
-  logoutBtn:  { background: '#c0392b', border: 'none', color: '#fff', padding: '5px 14px', cursor: 'pointer', borderRadius: 4, fontSize: 13, marginLeft: 8 },
-  section:    { padding: 24, maxWidth: 900, margin: '0 auto' },
-  card:       { background: '#fff', borderRadius: 8, padding: 20, marginBottom: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.08)' },
-  cardHead:   { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
-  h2:         { margin: 0, fontSize: 18 },
-  table:      { width: '100%', borderCollapse: 'collapse', fontSize: 14 },
-  th:         { textAlign: 'left', padding: '8px 12px', borderBottom: '2px solid #eee', background: '#fafafa', fontWeight: '600' },
-  td:         { padding: '8px 12px', borderBottom: '1px solid #eee', verticalAlign: 'middle' },
-  btn:        { padding: '5px 12px', cursor: 'pointer', borderRadius: 4, border: 'none', fontSize: 13, marginRight: 4 },
-  btnPrimary: { background: '#16213e', color: '#fff' },
-  formPanel:  { background: '#f8f9fa', border: '1px solid #e9ecef', borderRadius: 6, padding: 16, marginBottom: 16 },
-  formRow:    { marginBottom: 12 },
-  label:      { display: 'block', marginBottom: 4, fontSize: 13, fontWeight: '500' },
-  input:      { padding: '7px 10px', border: '1px solid #ccc', borderRadius: 4, fontSize: 14, width: '100%', boxSizing: 'border-box' },
-  error:      { color: '#dc3545', fontSize: 13, margin: '8px 0' },
-  loading:    { color: '#888', fontSize: 13, margin: '8px 0' },
-  empty:      { color: '#aaa', fontSize: 14, padding: '12px 0' },
-  badge:      { padding: '2px 9px', borderRadius: 12, fontSize: 12, fontWeight: '600', display: 'inline-block' },
+  page:           { fontFamily: 'sans-serif', minHeight: '100vh', background: '#f0f2f5' },
+  nav:            { background: '#16213e', color: '#fff', display: 'flex', alignItems: 'center', padding: '0 16px', gap: 8, height: 56, position: 'relative' },
+  navTitle:       { fontWeight: 'bold', fontSize: 17, marginRight: 8 },
+  navSep:         { flex: 1 },
+  tab:            { background: 'none', border: '1px solid rgba(255,255,255,0.4)', color: '#ccc', padding: '5px 14px', cursor: 'pointer', borderRadius: 4, fontSize: 13 },
+  tabActive:      { background: '#fff', border: '1px solid #fff', color: '#16213e', padding: '5px 14px', cursor: 'pointer', borderRadius: 4, fontSize: 13, fontWeight: '600' },
+  subTab:         { background: 'none', border: '1px solid #ccc', color: '#555', padding: '4px 12px', cursor: 'pointer', borderRadius: 4, fontSize: 13, marginRight: 6 },
+  subTabActive:   { background: '#16213e', border: '1px solid #16213e', color: '#fff', padding: '4px 12px', cursor: 'pointer', borderRadius: 4, fontSize: 13, marginRight: 6, fontWeight: '600' },
+  logoutBtn:      { background: '#c0392b', border: 'none', color: '#fff', padding: '5px 12px', minHeight: 36, cursor: 'pointer', borderRadius: 4, fontSize: 13 },
+  hamburger:      { background: 'none', border: '1px solid rgba(255,255,255,0.5)', color: '#fff', padding: '4px 10px', cursor: 'pointer', borderRadius: 4, fontSize: 20, lineHeight: '1.2' },
+  mobileMenu:     { position: 'absolute', top: 56, left: 0, right: 0, background: '#16213e', zIndex: 200, borderTop: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 4px 8px rgba(0,0,0,0.3)' },
+  mobileTab:      { display: 'block', width: '100%', textAlign: 'left', background: 'none', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.07)', color: '#ccc', padding: '14px 20px', fontSize: 15, cursor: 'pointer' },
+  mobileTabActive:{ display: 'block', width: '100%', textAlign: 'left', background: 'rgba(255,255,255,0.1)', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.07)', color: '#fff', fontWeight: '600', padding: '14px 20px', fontSize: 15, cursor: 'pointer' },
+  section:        { padding: 16, maxWidth: 900, margin: '0 auto' },
+  card:           { background: '#fff', borderRadius: 8, padding: 16, marginBottom: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.08)' },
+  cardHead:       { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 8 },
+  h2:             { margin: 0, fontSize: 18 },
+  tableWrapper:   { overflowX: 'auto' },
+  table:          { width: '100%', borderCollapse: 'collapse', fontSize: 14, minWidth: 420 },
+  th:             { textAlign: 'left', padding: '8px 12px', borderBottom: '2px solid #eee', background: '#fafafa', fontWeight: '600', whiteSpace: 'nowrap' },
+  td:             { padding: '8px 12px', borderBottom: '1px solid #eee', verticalAlign: 'middle' },
+  btn:            { padding: '8px 12px', minHeight: 36, cursor: 'pointer', borderRadius: 4, border: 'none', fontSize: 13, marginRight: 4 },
+  btnPrimary:     { background: '#16213e', color: '#fff' },
+  formPanel:      { background: '#f8f9fa', border: '1px solid #e9ecef', borderRadius: 6, padding: 16, marginBottom: 16 },
+  formRow:        { marginBottom: 12 },
+  label:          { display: 'block', marginBottom: 4, fontSize: 13, fontWeight: '500' },
+  input:          { padding: '9px 10px', border: '1px solid #ccc', borderRadius: 4, fontSize: 14, width: '100%', boxSizing: 'border-box' },
+  error:          { color: '#dc3545', fontSize: 13, margin: '8px 0' },
+  loading:        { color: '#888', fontSize: 13, margin: '8px 0' },
+  empty:          { color: '#aaa', fontSize: 14, padding: '12px 0' },
+  badge:          { padding: '2px 9px', borderRadius: 12, fontSize: 12, fontWeight: '600', display: 'inline-block' },
 };
 
 const BADGE_COLORS = {
@@ -78,6 +93,7 @@ function SectionPaiements() {
       {!loading && paiements.length === 0 && <p style={s.empty}>Aucun paiement enregistré.</p>}
 
       {paiements.length > 0 && (
+        <div style={s.tableWrapper}>
         <table style={s.table}>
           <thead>
             <tr>
@@ -98,6 +114,7 @@ function SectionPaiements() {
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </div>
   );
@@ -196,6 +213,7 @@ function SectionProblemes() {
       {!loading && problemes.length === 0 && <p style={s.empty}>Aucun problème signalé.</p>}
 
       {problemes.length > 0 && (
+        <div style={s.tableWrapper}>
         <table style={s.table}>
           <thead>
             <tr>
@@ -216,6 +234,7 @@ function SectionProblemes() {
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </div>
   );
@@ -400,31 +419,56 @@ const TABS = [
 
 export default function DashboardResident() {
   const { user, logout } = useAuth();
+  const isMobile         = useIsMobile();
   const [activeTab, setActiveTab] = useState(
     () => localStorage.getItem('resident_activeTab') || 'paiements'
   );
+  const [menuOpen, setMenuOpen] = useState(false);
 
   function handleTabChange(key) {
     localStorage.setItem('resident_activeTab', key);
     setActiveTab(key);
+    setMenuOpen(false);
   }
 
   return (
     <div style={s.page}>
       <nav style={s.nav}>
         <span style={s.navTitle}>ResiConnect</span>
-        {TABS.map(tab => (
-          <button
-            key={tab.key}
-            style={activeTab === tab.key ? s.tabActive : s.tab}
-            onClick={() => handleTabChange(tab.key)}
-          >
-            {tab.label}
+
+        {isMobile ? (
+          <button style={s.hamburger} onClick={() => setMenuOpen(v => !v)} aria-label="Menu">
+            {menuOpen ? '✕' : '☰'}
           </button>
-        ))}
+        ) : (
+          TABS.map(tab => (
+            <button
+              key={tab.key}
+              style={activeTab === tab.key ? s.tabActive : s.tab}
+              onClick={() => handleTabChange(tab.key)}
+            >
+              {tab.label}
+            </button>
+          ))
+        )}
+
         <span style={s.navSep} />
-        <span style={{ fontSize: 13, color: '#ccc' }}>{user?.nom}</span>
-        <button style={s.logoutBtn} onClick={logout}>Se déconnecter</button>
+        {!isMobile && <span style={{ fontSize: 13, color: '#ccc', marginRight: 8 }}>{user?.nom}</span>}
+        <button style={s.logoutBtn} onClick={logout}>Déconnecter</button>
+
+        {isMobile && menuOpen && (
+          <div style={s.mobileMenu}>
+            {TABS.map(tab => (
+              <button
+                key={tab.key}
+                style={activeTab === tab.key ? s.mobileTabActive : s.mobileTab}
+                onClick={() => handleTabChange(tab.key)}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        )}
       </nav>
 
       <div style={s.section}>
