@@ -284,6 +284,10 @@ function SectionMessages() {
   const [gestionnaireId, setGestionnaireId] = useState(null);
   const { user }                        = useAuth();
   const bottomRef                       = useRef(null);
+  const messagesContainerRef            = useRef(null);
+  const shouldScrollRef                 = useRef(false);
+  const prevCountRef                    = useRef(0);
+  const [showNewBadge, setShowNewBadge] = useState(false);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
@@ -296,15 +300,38 @@ function SectionMessages() {
   }, []);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (shouldScrollRef.current) {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+      shouldScrollRef.current = false;
+    }
   }, [messages]);
 
+  function isAtBottom() {
+    const el = messagesContainerRef.current;
+    if (!el) return true;
+    return el.scrollHeight - el.scrollTop - el.clientHeight < 50;
+  }
+
+  function scrollToBottom() {
+    setShowNewBadge(false);
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }
+
   async function fetchMessages(isInitial = false) {
+    const wasAtBottom = isAtBottom();
     if (isInitial) setLoading(true);
     setError('');
     try {
       const { data } = await api.get('/api/messages');
+      const prevCount = prevCountRef.current;
+      prevCountRef.current = data.length;
       setMessages(data);
+      if (isInitial || wasAtBottom) {
+        shouldScrollRef.current = true;
+        setShowNewBadge(false);
+      } else if (data.length > prevCount) {
+        setShowNewBadge(true);
+      }
     } catch {
       if (isInitial) setError('Impossible de charger les messages.');
     } finally {
@@ -320,7 +347,8 @@ function SectionMessages() {
     try {
       await api.post('/api/messages', { contenu, destinataire_id: gestionnaireId });
       setContenu('');
-      fetchMessages();
+      shouldScrollRef.current = true;
+      fetchMessages(false);
     } catch (err) {
       setError(err.response?.data?.message || 'Erreur lors de l\'envoi.');
     } finally {
@@ -335,7 +363,7 @@ function SectionMessages() {
       {error   && <p style={s.error}>{error}</p>}
       {loading && <p style={s.loading}>Chargement...</p>}
 
-      <div style={{ height: 340, overflowY: 'auto', border: '1px solid #eee', borderRadius: 6, padding: 12, marginBottom: 12, background: '#fafafa' }}>
+      <div ref={messagesContainerRef} style={{ height: 340, overflowY: 'auto', border: '1px solid #eee', borderRadius: 6, padding: 12, marginBottom: 12, background: '#fafafa' }}>
         {messages.length === 0 && !loading && (
           <p style={s.empty}>Aucun message. Commencez la conversation.</p>
         )}
@@ -369,6 +397,11 @@ function SectionMessages() {
         <div ref={bottomRef} />
       </div>
 
+      {showNewBadge && (
+        <div style={{ textAlign: 'center', padding: '4px 0' }}>
+          <button onClick={scrollToBottom} style={{ background: '#16213e', color: '#fff', border: 'none', borderRadius: 20, padding: '5px 16px', fontSize: 13, cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.25)' }}>Nouveau message ↓</button>
+        </div>
+      )}
       <form onSubmit={handleSend} style={{ display: 'flex', gap: 8 }}>
         <input
           style={{ ...s.input, flex: 1 }}
