@@ -570,27 +570,71 @@ function SectionMessages({ onRead }) {
   const { user }                  = useAuth();
   const isMobile                  = useIsMobile();
   const bottomRef                 = useRef(null);
+  const messagesContainerRef      = useRef(null);
+  const shouldScrollRef           = useRef(false);
+  const prevThreadCountRef        = useRef(0);
+  const selectedIdRef             = useRef(null);
+  const [showNewBadge, setShowNewBadge] = useState(false);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { fetchMessages(); }, []);
+  useEffect(() => {
+    fetchMessages(true);
+    const id = setInterval(() => fetchMessages(false), 3000);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => { selectedIdRef.current = selectedId; }, [selectedId]);
+
+  useEffect(() => {
+    if (shouldScrollRef.current) {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+      shouldScrollRef.current = false;
+    }
+  }, [messages]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [selectedId, messages]);
+    setShowNewBadge(false);
+    prevThreadCountRef.current = 0;
+  }, [selectedId]);
 
-  async function fetchMessages() {
-    setLoading(true);
+  function isAtBottom() {
+    const el = messagesContainerRef.current;
+    if (!el) return true;
+    return el.scrollHeight - el.scrollTop - el.clientHeight < 50;
+  }
+
+  function scrollToBottom() {
+    setShowNewBadge(false);
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  async function fetchMessages(isInitial = false) {
+    const wasAtBottom = isAtBottom();
+    if (isInitial) setLoading(true);
     setError('');
     try {
       const { data } = await api.get('/api/messages');
+      const curId = selectedIdRef.current;
+      const newThread = curId
+        ? data.filter(m => m.expediteur_id === curId || m.destinataire_id === curId)
+        : [];
+      const prevCount = prevThreadCountRef.current;
+      prevThreadCountRef.current = newThread.length;
       setMessages(data);
+      if (isInitial || wasAtBottom) {
+        shouldScrollRef.current = true;
+        setShowNewBadge(false);
+      } else if (newThread.length > prevCount) {
+        setShowNewBadge(true);
+      }
       const unread = data.filter(m => !m.lu);
       await Promise.all(unread.map(m => api.put(`/api/messages/${m.id}/lu`).catch(() => {})));
       if (unread.length > 0) onRead?.();
     } catch {
-      setError('Impossible de charger les messages.');
+      if (isInitial) setError('Impossible de charger les messages.');
     } finally {
-      setLoading(false);
+      if (isInitial) setLoading(false);
     }
   }
 
@@ -602,7 +646,8 @@ function SectionMessages({ onRead }) {
     try {
       await api.post('/api/messages', { contenu: reply, destinataire_id: selectedId });
       setReply('');
-      fetchMessages();
+      shouldScrollRef.current = true;
+      fetchMessages(false);
     } catch (err) {
       setError(err.response?.data?.message || 'Erreur lors de l\'envoi.');
     } finally {
@@ -650,7 +695,7 @@ function SectionMessages({ onRead }) {
               >
                 ← Retour
               </button>
-              <div style={{ flex: 1, overflowY: 'auto', paddingBottom: 8 }}>
+              <div ref={messagesContainerRef} style={{ flex: 1, overflowY: 'auto', paddingBottom: 8 }}>
                 {thread.map(m => {
                   const mine = m.expediteur_id === user?.id;
                   return (
@@ -665,6 +710,11 @@ function SectionMessages({ onRead }) {
                 })}
                 <div ref={bottomRef} />
               </div>
+              {showNewBadge && (
+                <div style={{ textAlign: 'center', padding: '4px 0' }}>
+                  <button onClick={scrollToBottom} style={{ background: '#1a1a2e', color: '#fff', border: 'none', borderRadius: 20, padding: '5px 16px', fontSize: 13, cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.25)' }}>Nouveau message ↓</button>
+                </div>
+              )}
               <form onSubmit={handleSend} style={{ display: 'flex', gap: 8, paddingTop: 8, borderTop: '1px solid #eee' }}>
                 <input style={{ ...s.input, flex: 1 }} placeholder="Répondre..." value={reply} onChange={e => setReply(e.target.value)} />
                 <button type="submit" style={{ ...s.btn, ...s.btnPrimary, marginRight: 0 }} disabled={sending || !reply.trim()}>{sending ? '...' : 'Envoyer'}</button>
@@ -703,7 +753,7 @@ function SectionMessages({ onRead }) {
               {!selectedId && <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><p style={s.empty}>Sélectionnez une conversation.</p></div>}
               {selectedId && (
                 <>
-                  <div style={{ flex: 1, overflowY: 'auto', paddingBottom: 8 }}>
+                  <div ref={messagesContainerRef} style={{ flex: 1, overflowY: 'auto', paddingBottom: 8 }}>
                     {thread.map(m => {
                       const mine = m.expediteur_id === user?.id;
                       return (
@@ -718,6 +768,11 @@ function SectionMessages({ onRead }) {
                     })}
                     <div ref={bottomRef} />
                   </div>
+                  {showNewBadge && (
+                    <div style={{ textAlign: 'center', padding: '4px 0' }}>
+                      <button onClick={scrollToBottom} style={{ background: '#1a1a2e', color: '#fff', border: 'none', borderRadius: 20, padding: '5px 16px', fontSize: 13, cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.25)' }}>Nouveau message ↓</button>
+                    </div>
+                  )}
                   <form onSubmit={handleSend} style={{ display: 'flex', gap: 8, paddingTop: 8, borderTop: '1px solid #eee' }}>
                     <input style={{ ...s.input, flex: 1 }} placeholder="Répondre..." value={reply} onChange={e => setReply(e.target.value)} />
                     <button type="submit" style={{ ...s.btn, ...s.btnPrimary, marginRight: 0 }} disabled={sending || !reply.trim()}>{sending ? '...' : 'Envoyer'}</button>
@@ -752,9 +807,12 @@ export default function DashboardGestionnaire() {
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
-    api.get('/api/messages')
+    const fetch = () => api.get('/api/messages')
       .then(({ data }) => setUnreadCount(data.filter(m => !m.lu).length))
       .catch(() => {});
+    fetch();
+    const id = setInterval(fetch, 3000);
+    return () => clearInterval(id);
   }, []);
 
   function handleTabChange(key) {
