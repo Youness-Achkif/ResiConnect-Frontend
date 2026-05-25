@@ -285,27 +285,30 @@ function SectionMessages() {
   const { user }                        = useAuth();
   const bottomRef                       = useRef(null);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    fetchMessages();
+    fetchMessages(true);
     api.get('/api/auth/gestionnaire')
       .then(({ data }) => setGestionnaireId(data.id))
       .catch(() => setError('Impossible de récupérer le destinataire.'));
+    const id = setInterval(() => fetchMessages(false), 3000);
+    return () => clearInterval(id);
   }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  async function fetchMessages() {
-    setLoading(true);
+  async function fetchMessages(isInitial = false) {
+    if (isInitial) setLoading(true);
     setError('');
     try {
       const { data } = await api.get('/api/messages');
       setMessages(data);
     } catch {
-      setError('Impossible de charger les messages.');
+      if (isInitial) setError('Impossible de charger les messages.');
     } finally {
-      setLoading(false);
+      if (isInitial) setLoading(false);
     }
   }
 

@@ -572,20 +572,18 @@ function SectionMessages({ onRead }) {
   const bottomRef                 = useRef(null);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { fetchMessages(); }, []);
-
   useEffect(() => {
-    const id = setInterval(fetchMessages, 3000);
+    fetchMessages(true);
+    const id = setInterval(() => fetchMessages(false), 3000);
     return () => clearInterval(id);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [selectedId, messages]);
 
-  async function fetchMessages() {
-    setLoading(true);
+  async function fetchMessages(isInitial = false) {
+    if (isInitial) setLoading(true);
     setError('');
     try {
       const { data } = await api.get('/api/messages');
@@ -594,9 +592,9 @@ function SectionMessages({ onRead }) {
       await Promise.all(unread.map(m => api.put(`/api/messages/${m.id}/lu`).catch(() => {})));
       if (unread.length > 0) onRead?.();
     } catch {
-      setError('Impossible de charger les messages.');
+      if (isInitial) setError('Impossible de charger les messages.');
     } finally {
-      setLoading(false);
+      if (isInitial) setLoading(false);
     }
   }
 
