@@ -576,11 +576,11 @@ function SectionMessages({ onRead }) {
   const selectedIdRef             = useRef(null);
   const [showNewBadge, setShowNewBadge] = useState(false);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchMessages(true);
     const id = setInterval(() => fetchMessages(false), 3000);
     return () => clearInterval(id);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => { selectedIdRef.current = selectedId; }, [selectedId]);
