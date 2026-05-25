@@ -575,6 +575,12 @@ function SectionMessages({ onRead }) {
   useEffect(() => { fetchMessages(); }, []);
 
   useEffect(() => {
+    const id = setInterval(fetchMessages, 3000);
+    return () => clearInterval(id);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [selectedId, messages]);
 
@@ -752,9 +758,12 @@ export default function DashboardGestionnaire() {
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
-    api.get('/api/messages')
+    const fetch = () => api.get('/api/messages')
       .then(({ data }) => setUnreadCount(data.filter(m => !m.lu).length))
       .catch(() => {});
+    fetch();
+    const id = setInterval(fetch, 3000);
+    return () => clearInterval(id);
   }, []);
 
   function handleTabChange(key) {
