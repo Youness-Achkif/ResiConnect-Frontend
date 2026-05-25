@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import { CLOUDINARY_IMAGE_URL, CLOUDINARY_RAW_URL, CLOUDINARY_UPLOAD_PRESET } from '../config/cloudinary';
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
@@ -195,6 +196,9 @@ function SectionPaiements() {
   const [showForm, setShowForm]     = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm]             = useState({ user_id: '', montant: '', date_paiement: '', statut: 'en attente' });
+  const [uploading, setUploading]   = useState(null);
+  const fileInputRef                = useRef(null);
+  const uploadIdRef                 = useRef(null);
 
   useEffect(() => {
     fetchPaiements();
@@ -256,6 +260,41 @@ function SectionPaiements() {
     }
   }
 
+  function triggerUpload(id) {
+    uploadIdRef.current = id;
+    setUploading(id);
+    fileInputRef.current.value = '';
+    fileInputRef.current.click();
+  }
+
+  async function handleUploadJustificatif(e) {
+    const file = e.target.files[0];
+    if (!file) { setUploading(null); return; }
+    if (file.size > 10 * 1024 * 1024) {
+      setError('Le fichier ne doit pas dépasser 10 MB.');
+      setUploading(null);
+      return;
+    }
+    const id    = uploadIdRef.current;
+    const isPdf = file.type === 'application/pdf';
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+    formData.append('resource_type', isPdf ? 'raw' : 'image');
+    try {
+      const uploadUrl = isPdf ? CLOUDINARY_RAW_URL : CLOUDINARY_IMAGE_URL;
+      const res  = await fetch(uploadUrl, { method: 'POST', body: formData });
+      const data = await res.json();
+      if (!data.secure_url) throw new Error();
+      await api.put(`/api/paiements/${id}`, { justificatif_url: data.secure_url });
+      setPaiements(prev => prev.map(p => p.id === id ? { ...p, justificatif_url: data.secure_url } : p));
+    } catch {
+      setError('Erreur lors de l\'upload du justificatif.');
+    } finally {
+      setUploading(null);
+    }
+  }
+
   return (
     <div style={s.card}>
       <div style={s.cardHead}>
@@ -299,6 +338,14 @@ function SectionPaiements() {
 
       {!loading && paiements.length === 0 && <p style={s.empty}>Aucun paiement enregistré.</p>}
 
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*,.pdf"
+        style={{ display: 'none' }}
+        onChange={handleUploadJustificatif}
+      />
+
       {paiements.length > 0 && (
         <div style={s.tableWrapper}>
         <table style={s.table}>
@@ -309,6 +356,7 @@ function SectionPaiements() {
               <th style={s.th}>Date</th>
               <th style={s.th}>Statut</th>
               <th style={s.th}>Changer statut</th>
+              <th style={s.th}>Justificatif</th>
               <th style={s.th}>Actions</th>
             </tr>
           </thead>
@@ -327,6 +375,18 @@ function SectionPaiements() {
                   >
                     {STATUTS_PAIEMENT.map(st => <option key={st} value={st}>{st}</option>)}
                   </select>
+                </td>
+                <td style={s.td}>
+                  {p.justificatif_url && (
+                    <a href={p.justificatif_url} target="_blank" rel="noreferrer" style={{ color: '#1a1a2e', fontSize: 13, marginRight: 8 }}>Voir justificatif</a>
+                  )}
+                  <button
+                    style={{ ...s.btnSm, background: '#6c757d', color: '#fff' }}
+                    onClick={() => triggerUpload(p.id)}
+                    disabled={uploading === p.id}
+                  >
+                    {uploading === p.id ? '...' : p.justificatif_url ? 'Changer' : 'Ajouter justificatif'}
+                  </button>
                 </td>
                 <td style={s.td}>
                   <button style={{ ...s.btn, ...s.btnDanger }} onClick={() => handleDelete(p.id)}>
