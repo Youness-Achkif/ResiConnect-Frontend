@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import { CLOUDINARY_AUTO_URL, CLOUDINARY_UPLOAD_PRESET } from '../config/cloudinary';
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
@@ -125,12 +126,14 @@ function SectionPaiements() {
 const PRIORITES = ['basse', 'normale', 'haute', 'urgente'];
 
 function SectionProblemes() {
-  const [problemes, setProblemes]   = useState([]);
-  const [loading, setLoading]       = useState(false);
-  const [error, setError]           = useState('');
-  const [showForm, setShowForm]     = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [form, setForm]             = useState({ titre: '', description: '', priorite: 'normale' });
+  const [problemes, setProblemes]       = useState([]);
+  const [loading, setLoading]           = useState(false);
+  const [error, setError]               = useState('');
+  const [showForm, setShowForm]         = useState(false);
+  const [submitting, setSubmitting]     = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [photoFile, setPhotoFile]       = useState(null);
+  const [form, setForm]                 = useState({ titre: '', description: '', priorite: 'normale' });
 
   useEffect(() => { fetchProblemes(); }, []);
 
@@ -152,14 +155,28 @@ function SectionProblemes() {
     setSubmitting(true);
     setError('');
     try {
-      await api.post('/api/problemes', form);
+      let photo_url = '';
+      if (photoFile) {
+        setUploadingPhoto(true);
+        const formData = new FormData();
+        formData.append('file', photoFile);
+        formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+        const res  = await fetch(CLOUDINARY_AUTO_URL, { method: 'POST', body: formData });
+        const data = await res.json();
+        if (!data.secure_url) throw new Error('Upload de la photo échoué.');
+        photo_url = data.secure_url;
+        setUploadingPhoto(false);
+      }
+      await api.post('/api/problemes', { ...form, ...(photo_url ? { photo_url } : {}) });
       setForm({ titre: '', description: '', priorite: 'normale' });
+      setPhotoFile(null);
       setShowForm(false);
       fetchProblemes();
     } catch (err) {
-      setError(err.response?.data?.message || 'Erreur lors du signalement.');
+      setError(err.response?.data?.message || err.message || 'Erreur lors du signalement.');
     } finally {
       setSubmitting(false);
+      setUploadingPhoto(false);
     }
   }
 
@@ -202,8 +219,25 @@ function SectionProblemes() {
               {PRIORITES.map(p => <option key={p} value={p}>{p}</option>)}
             </select>
           </div>
+          <div style={s.formRow}>
+            <label style={s.label}>Photo (optionnel)</label>
+            <input
+              type="file"
+              accept="image/*"
+              style={s.input}
+              onChange={e => {
+                const file = e.target.files[0];
+                if (file && file.size > 10 * 1024 * 1024) {
+                  setError('Le fichier ne doit pas dépasser 10 MB.');
+                  e.target.value = '';
+                  return;
+                }
+                setPhotoFile(file || null);
+              }}
+            />
+          </div>
           <button type="submit" style={{ ...s.btn, ...s.btnPrimary }} disabled={submitting}>
-            {submitting ? 'Envoi...' : 'Signaler'}
+            {submitting ? (uploadingPhoto ? 'Upload...' : 'Envoi...') : 'Signaler'}
           </button>
         </form>
       )}
@@ -221,6 +255,7 @@ function SectionProblemes() {
               <th style={s.th}>Description</th>
               <th style={s.th}>Statut</th>
               <th style={s.th}>Priorité</th>
+              <th style={s.th}>Photo</th>
             </tr>
           </thead>
           <tbody>
@@ -230,6 +265,11 @@ function SectionProblemes() {
                 <td style={{ ...s.td, maxWidth: 260, color: '#555' }}>{p.description ?? '—'}</td>
                 <td style={s.td}><Badge value={p.statut} /></td>
                 <td style={s.td}><Badge value={p.priorite} /></td>
+                <td style={s.td}>
+                  {p.photo_url
+                    ? <a href={p.photo_url} target="_blank" rel="noreferrer" style={{ color: '#16213e', fontSize: 13 }}>Voir photo</a>
+                    : <span style={{ color: '#aaa', fontSize: 13 }}>—</span>}
+                </td>
               </tr>
             ))}
           </tbody>

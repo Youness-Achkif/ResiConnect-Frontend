@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
-import { CLOUDINARY_IMAGE_URL, CLOUDINARY_RAW_URL, CLOUDINARY_UPLOAD_PRESET } from '../config/cloudinary';
+import { CLOUDINARY_IMAGE_URL, CLOUDINARY_RAW_URL, CLOUDINARY_AUTO_URL, CLOUDINARY_UPLOAD_PRESET } from '../config/cloudinary';
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
@@ -412,6 +412,9 @@ function SectionProblemes() {
   const [problemes, setProblemes] = useState([]);
   const [loading, setLoading]     = useState(false);
   const [error, setError]         = useState('');
+  const [uploading, setUploading] = useState(null);
+  const fileInputRef              = useRef(null);
+  const uploadIdRef               = useRef(null);
 
   useEffect(() => { fetchProblemes(); }, []);
 
@@ -438,6 +441,38 @@ function SectionProblemes() {
     }
   }
 
+  function triggerUploadPhoto(id) {
+    uploadIdRef.current = id;
+    setUploading(id);
+    fileInputRef.current.value = '';
+    fileInputRef.current.click();
+  }
+
+  async function handleUploadPhoto(e) {
+    const file = e.target.files[0];
+    if (!file) { setUploading(null); return; }
+    if (file.size > 10 * 1024 * 1024) {
+      setError('Le fichier ne doit pas dépasser 10 MB.');
+      setUploading(null);
+      return;
+    }
+    const id = uploadIdRef.current;
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+    try {
+      const res  = await fetch(CLOUDINARY_AUTO_URL, { method: 'POST', body: formData });
+      const data = await res.json();
+      if (!data.secure_url) throw new Error();
+      await api.put(`/api/problemes/${id}`, { photo_url: data.secure_url });
+      setProblemes(prev => prev.map(p => p.id === id ? { ...p, photo_url: data.secure_url } : p));
+    } catch {
+      setError('Erreur lors de l\'upload de la photo.');
+    } finally {
+      setUploading(null);
+    }
+  }
+
   return (
     <div style={s.card}>
       <div style={s.cardHead}>
@@ -449,6 +484,14 @@ function SectionProblemes() {
 
       {!loading && problemes.length === 0 && <p style={s.empty}>Aucun problème signalé.</p>}
 
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={handleUploadPhoto}
+      />
+
       {problemes.length > 0 && (
         <div style={s.tableWrapper}>
         <table style={s.table}>
@@ -459,6 +502,7 @@ function SectionProblemes() {
               <th style={s.th}>Description</th>
               <th style={s.th}>Statut</th>
               <th style={s.th}>Priorité</th>
+              <th style={s.th}>Photo</th>
               <th style={s.th}>Changer statut</th>
               <th style={s.th}>Changer priorité</th>
             </tr>
@@ -471,6 +515,18 @@ function SectionProblemes() {
                 <td style={{ ...s.td, maxWidth: 260, color: '#555' }}>{p.description ?? '—'}</td>
                 <td style={s.td}><Badge value={p.statut} /></td>
                 <td style={s.td}><Badge value={p.priorite} /></td>
+                <td style={s.td}>
+                  {p.photo_url && (
+                    <a href={p.photo_url} target="_blank" rel="noreferrer" style={{ color: '#1a1a2e', fontSize: 13, marginRight: 8 }}>Voir photo</a>
+                  )}
+                  <button
+                    style={{ ...s.btnSm, background: '#6c757d', color: '#fff' }}
+                    onClick={() => triggerUploadPhoto(p.id)}
+                    disabled={uploading === p.id}
+                  >
+                    {uploading === p.id ? '...' : p.photo_url ? 'Changer' : 'Ajouter photo'}
+                  </button>
+                </td>
                 <td style={s.td}>
                   <select
                     style={s.select}
