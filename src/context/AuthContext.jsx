@@ -1,8 +1,13 @@
+<<<<<<< HEAD
 import { createContext, useContext, useState, useEffect } from "react";
+=======
+import React, { createContext, useContext, useState } from 'react';
+>>>>>>> 2b72b0b48b961df35c287b002bc9682ee65f089b
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
+<<<<<<< HEAD
   const [user, setUser]       = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -61,16 +66,44 @@ export function AuthProvider({ children }) {
   // ── Déconnexion ──
   const logout = () => {
     localStorage.removeItem("rc_user");
+=======
+  const [token, setToken] = useState(() => localStorage.getItem('token'));
+  const [user, setUser] = useState(() => {
+    const stored = localStorage.getItem('user');
+    return stored ? JSON.parse(stored) : null;
+  });
+
+  const login = (userData, tokenValue) => {
+    localStorage.setItem('token', tokenValue);
+    localStorage.setItem('user', JSON.stringify(userData));
+    setToken(tokenValue);
+    setUser(userData);
+  };
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setToken(null);
+>>>>>>> 2b72b0b48b961df35c287b002bc9682ee65f089b
     setUser(null);
   };
 
   return (
+<<<<<<< HEAD
     <AuthContext.Provider value={{ user, loading, login, register, logout }}>
       {!loading && children}
+=======
+    <AuthContext.Provider value={{ token, user, login, logout }}>
+      {children}
+>>>>>>> 2b72b0b48b961df35c287b002bc9682ee65f089b
     </AuthContext.Provider>
   );
 }
 
 export function useAuth() {
   return useContext(AuthContext);
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 2b72b0b48b961df35c287b002bc9682ee65f089b
