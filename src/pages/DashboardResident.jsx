@@ -150,6 +150,16 @@ function SectionProblemes() {
     }
   }
 
+  async function handleDelete(id) {
+    if (!window.confirm('Supprimer ce problème ?')) return;
+    try {
+      await api.delete(`/api/problemes/${id}`);
+      setProblemes(prev => prev.filter(p => p.id !== id));
+    } catch {
+      setError('Impossible de supprimer ce problème.');
+    }
+  }
+
   async function handleCreate(e) {
     e.preventDefault();
     setSubmitting(true);
@@ -256,6 +266,7 @@ function SectionProblemes() {
               <th style={s.th}>Statut</th>
               <th style={s.th}>Priorité</th>
               <th style={s.th}>Photo</th>
+              <th style={s.th}></th>
             </tr>
           </thead>
           <tbody>
@@ -269,6 +280,12 @@ function SectionProblemes() {
                   {p.photo_url
                     ? <a href={p.photo_url} target="_blank" rel="noreferrer" style={{ color: '#16213e', fontSize: 13 }}>Voir photo</a>
                     : <span style={{ color: '#aaa', fontSize: 13 }}>—</span>}
+                </td>
+                <td style={s.td}>
+                  <button
+                    style={{ ...s.btn, background: '#dc3545', color: '#fff', marginRight: 0 }}
+                    onClick={() => handleDelete(p.id)}
+                  >Supprimer</button>
                 </td>
               </tr>
             ))}
