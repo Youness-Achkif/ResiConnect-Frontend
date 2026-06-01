@@ -405,8 +405,7 @@ function SectionPaiements() {
 
 // ─── Section Problèmes ────────────────────────────────────────────────────────
 
-const STATUTS_PROBLEME  = ['ouvert', 'en cours', 'résolu'];
-const PRIORITES_PROBLEME = ['haute', 'normale', 'basse'];
+const STATUTS_PROBLEME = ['ouvert', 'en cours', 'résolu'];
 
 function SectionProblemes() {
   const [problemes, setProblemes] = useState([]);
@@ -460,7 +459,6 @@ function SectionProblemes() {
               <th style={s.th}>Priorité</th>
               <th style={s.th}>Photo</th>
               <th style={s.th}>Changer statut</th>
-              <th style={s.th}>Changer priorité</th>
             </tr>
           </thead>
           <tbody>
@@ -483,15 +481,6 @@ function SectionProblemes() {
                     onChange={e => handleUpdate(p.id, { statut: e.target.value })}
                   >
                     {STATUTS_PROBLEME.map(st => <option key={st} value={st}>{st}</option>)}
-                  </select>
-                </td>
-                <td style={s.td}>
-                  <select
-                    style={s.select}
-                    value={p.priorite}
-                    onChange={e => handleUpdate(p.id, { priorite: e.target.value })}
-                  >
-                    {PRIORITES_PROBLEME.map(pr => <option key={pr} value={pr}>{pr}</option>)}
                   </select>
                 </td>
               </tr>
