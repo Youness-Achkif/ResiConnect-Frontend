@@ -123,7 +123,7 @@ function SectionPaiements() {
 
 // ─── Section Mes Problèmes ────────────────────────────────────────────────────
 
-const PRIORITES = ['basse', 'normale', 'haute', 'urgente'];
+const PRIORITES = ['basse', 'normale', 'haute'];
 
 function SectionProblemes() {
   const [problemes, setProblemes]       = useState([]);
@@ -137,6 +137,9 @@ function SectionProblemes() {
   const [uploadingRow, setUploadingRow] = useState(null);
   const photoInputRef                   = useRef(null);
   const uploadRowIdRef                  = useRef(null);
+  const [editId, setEditId]             = useState(null);
+  const [editForm, setEditForm]         = useState({ titre: '', description: '', priorite: 'normale' });
+  const [editSubmitting, setEditSubmitting] = useState(false);
 
   useEffect(() => { fetchProblemes(); }, []);
 
@@ -160,6 +163,26 @@ function SectionProblemes() {
       setProblemes(prev => prev.filter(p => p.id !== id));
     } catch {
       setError('Impossible de supprimer ce problème.');
+    }
+  }
+
+  function openEdit(p) {
+    setEditId(p.id);
+    setEditForm({ titre: p.titre, description: p.description ?? '', priorite: p.priorite ?? 'normale' });
+  }
+
+  async function handleEditSubmit(e, id) {
+    e.preventDefault();
+    setEditSubmitting(true);
+    setError('');
+    try {
+      await api.put(`/api/problemes/${id}`, editForm);
+      setProblemes(prev => prev.map(p => p.id === id ? { ...p, ...editForm } : p));
+      setEditId(null);
+    } catch {
+      setError('Erreur lors de la modification.');
+    } finally {
+      setEditSubmitting(false);
     }
   }
 
@@ -313,7 +336,34 @@ function SectionProblemes() {
             </tr>
           </thead>
           <tbody>
-            {problemes.map(p => (
+            {problemes.map(p => editId === p.id ? (
+              <tr key={p.id}>
+                <td colSpan={6} style={s.td}>
+                  <form onSubmit={e => handleEditSubmit(e, p.id)} style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+                    <div>
+                      <label style={{ ...s.label, marginBottom: 2 }}>Titre</label>
+                      <input style={{ ...s.input, width: 180 }} value={editForm.titre} onChange={e => setEditForm({ ...editForm, titre: e.target.value })} required />
+                    </div>
+                    <div>
+                      <label style={{ ...s.label, marginBottom: 2 }}>Description</label>
+                      <input style={{ ...s.input, width: 240 }} value={editForm.description} onChange={e => setEditForm({ ...editForm, description: e.target.value })} />
+                    </div>
+                    <div>
+                      <label style={{ ...s.label, marginBottom: 2 }}>Priorité</label>
+                      <select style={{ ...s.input, width: 'auto' }} value={editForm.priorite} onChange={e => setEditForm({ ...editForm, priorite: e.target.value })}>
+                        {PRIORITES.map(pr => <option key={pr} value={pr}>{pr}</option>)}
+                      </select>
+                    </div>
+                    <button type="submit" style={{ ...s.btn, ...s.btnPrimary }} disabled={editSubmitting}>
+                      {editSubmitting ? '...' : 'Enregistrer'}
+                    </button>
+                    <button type="button" style={{ ...s.btn, background: '#6c757d', color: '#fff', marginRight: 0 }} onClick={() => setEditId(null)}>
+                      Annuler
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            ) : (
               <tr key={p.id}>
                 <td style={s.td}>{p.titre}</td>
                 <td style={{ ...s.td, maxWidth: 260, color: '#555' }}>{p.description ?? '—'}</td>
@@ -332,6 +382,10 @@ function SectionProblemes() {
                   </button>
                 </td>
                 <td style={s.td}>
+                  <button
+                    style={{ ...s.btn, ...s.btnPrimary, marginRight: 4 }}
+                    onClick={() => openEdit(p)}
+                  >Modifier</button>
                   <button
                     style={{ ...s.btn, background: '#dc3545', color: '#fff', marginRight: 0 }}
                     onClick={() => handleDelete(p.id)}
