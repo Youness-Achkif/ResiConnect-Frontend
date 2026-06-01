@@ -297,7 +297,8 @@ function SectionAnnonces() {
   }, []);
 
   return (
-    <>
+    <div style={s.card}>
+      <div style={s.cardHead}><h2 style={s.h2}>Annonces</h2></div>
       {error   && <p style={s.error}>{error}</p>}
       {loading && <p style={s.loading}>Chargement...</p>}
       {!loading && annonces.length === 0 && <p style={s.empty}>Aucune annonce pour le moment.</p>}
@@ -311,7 +312,7 @@ function SectionAnnonces() {
           </div>
         </div>
       ))}
-    </>
+    </div>
   );
 }
 
@@ -399,7 +400,8 @@ function SectionMessages() {
   const isMe = (msg) => msg.expediteur_id === user?.id || msg.role === 'resident';
 
   return (
-    <>
+    <div style={s.card}>
+      <div style={s.cardHead}><h2 style={s.h2}>Messages</h2></div>
       {error   && <p style={s.error}>{error}</p>}
       {loading && <p style={s.loading}>Chargement...</p>}
 
@@ -453,34 +455,6 @@ function SectionMessages() {
           {sending ? '...' : 'Envoyer'}
         </button>
       </form>
-    </>
-  );
-}
-
-function SectionMessagerie() {
-  const [subTab, setSubTab] = useState(
-    () => localStorage.getItem('resident_subTab') || 'annonces'
-  );
-
-  function handleSubTab(key) {
-    localStorage.setItem('resident_subTab', key);
-    setSubTab(key);
-  }
-
-  return (
-    <div style={s.card}>
-      <div style={{ marginBottom: 16 }}>
-        <h2 style={{ ...s.h2, marginBottom: 12 }}>Messagerie</h2>
-        <button style={subTab === 'annonces' ? s.subTabActive : s.subTab} onClick={() => handleSubTab('annonces')}>
-          Annonces
-        </button>
-        <button style={subTab === 'messages' ? s.subTabActive : s.subTab} onClick={() => handleSubTab('messages')}>
-          Messages
-        </button>
-      </div>
-
-      {subTab === 'annonces' && <SectionAnnonces />}
-      {subTab === 'messages' && <SectionMessages />}
     </div>
   );
 }
@@ -488,9 +462,10 @@ function SectionMessagerie() {
 // ─── Dashboard principal ──────────────────────────────────────────────────────
 
 const TABS = [
-  { key: 'paiements',  label: 'Mes paiements'  },
-  { key: 'problemes',  label: 'Mes problèmes'  },
-  { key: 'messagerie', label: 'Messagerie'      },
+  { key: 'paiements', label: 'Mes paiements' },
+  { key: 'problemes', label: 'Mes problèmes' },
+  { key: 'annonces',  label: 'Annonces'      },
+  { key: 'messages',  label: 'Messages'      },
 ];
 
 export default function DashboardResident() {
@@ -548,9 +523,10 @@ export default function DashboardResident() {
       </nav>
 
       <div style={s.section}>
-        {activeTab === 'paiements'  && <SectionPaiements />}
-        {activeTab === 'problemes'  && <SectionProblemes />}
-        {activeTab === 'messagerie' && <SectionMessagerie />}
+        {activeTab === 'paiements' && <SectionPaiements />}
+        {activeTab === 'problemes' && <SectionProblemes />}
+        {activeTab === 'annonces'  && <SectionAnnonces />}
+        {activeTab === 'messages'  && <SectionMessages />}
       </div>
     </div>
   );
