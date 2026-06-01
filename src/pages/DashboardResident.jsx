@@ -101,6 +101,7 @@ function SectionPaiements() {
               <th style={s.th}>Montant</th>
               <th style={s.th}>Date</th>
               <th style={s.th}>Statut</th>
+              <th style={s.th}>Justificatif</th>
             </tr>
           </thead>
           <tbody>
@@ -111,6 +112,11 @@ function SectionPaiements() {
                   {p.date_paiement ? new Date(p.date_paiement).toLocaleDateString('fr-FR') : '—'}
                 </td>
                 <td style={s.td}><Badge value={p.statut} /></td>
+                <td style={s.td}>
+                  {p.justificatif_url
+                    ? <a href={p.justificatif_url} target="_blank" rel="noreferrer" style={{ color: '#16213e', fontSize: 13 }}>Voir justificatif</a>
+                    : <span style={{ color: '#aaa', fontSize: 13 }}>—</span>}
+                </td>
               </tr>
             ))}
           </tbody>
