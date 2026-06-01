@@ -412,10 +412,6 @@ function SectionProblemes() {
   const [problemes, setProblemes] = useState([]);
   const [loading, setLoading]     = useState(false);
   const [error, setError]         = useState('');
-  const [uploading, setUploading] = useState(null);
-  const fileInputRef              = useRef(null);
-  const uploadIdRef               = useRef(null);
-
   useEffect(() => { fetchProblemes(); }, []);
 
   async function fetchProblemes() {
@@ -441,38 +437,6 @@ function SectionProblemes() {
     }
   }
 
-  function triggerUploadPhoto(id) {
-    uploadIdRef.current = id;
-    setUploading(id);
-    fileInputRef.current.value = '';
-    fileInputRef.current.click();
-  }
-
-  async function handleUploadPhoto(e) {
-    const file = e.target.files[0];
-    if (!file) { setUploading(null); return; }
-    if (file.size > 10 * 1024 * 1024) {
-      setError('Le fichier ne doit pas dépasser 10 MB.');
-      setUploading(null);
-      return;
-    }
-    const id = uploadIdRef.current;
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-    try {
-      const res  = await fetch(CLOUDINARY_AUTO_URL, { method: 'POST', body: formData });
-      const data = await res.json();
-      if (!data.secure_url) throw new Error();
-      await api.put(`/api/problemes/${id}`, { photo_url: data.secure_url });
-      setProblemes(prev => prev.map(p => p.id === id ? { ...p, photo_url: data.secure_url } : p));
-    } catch {
-      setError('Erreur lors de l\'upload de la photo.');
-    } finally {
-      setUploading(null);
-    }
-  }
-
   return (
     <div style={s.card}>
       <div style={s.cardHead}>
@@ -483,14 +447,6 @@ function SectionProblemes() {
       {loading && <p style={s.loading}>Chargement...</p>}
 
       {!loading && problemes.length === 0 && <p style={s.empty}>Aucun problème signalé.</p>}
-
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        style={{ display: 'none' }}
-        onChange={handleUploadPhoto}
-      />
 
       {problemes.length > 0 && (
         <div style={s.tableWrapper}>
@@ -516,16 +472,9 @@ function SectionProblemes() {
                 <td style={s.td}><Badge value={p.statut} /></td>
                 <td style={s.td}><Badge value={p.priorite} /></td>
                 <td style={s.td}>
-                  {p.photo_url && (
-                    <a href={p.photo_url} target="_blank" rel="noreferrer" style={{ color: '#1a1a2e', fontSize: 13, marginRight: 8 }}>Voir photo</a>
-                  )}
-                  <button
-                    style={{ ...s.btnSm, background: '#6c757d', color: '#fff' }}
-                    onClick={() => triggerUploadPhoto(p.id)}
-                    disabled={uploading === p.id}
-                  >
-                    {uploading === p.id ? '...' : p.photo_url ? 'Changer' : 'Ajouter photo'}
-                  </button>
+                  {p.photo_url
+                    ? <a href={p.photo_url} target="_blank" rel="noreferrer" style={{ color: '#1a1a2e', fontSize: 13 }}>Voir photo</a>
+                    : <span style={{ color: '#aaa', fontSize: 13 }}>—</span>}
                 </td>
                 <td style={s.td}>
                   <select

@@ -134,6 +134,9 @@ function SectionProblemes() {
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [photoFile, setPhotoFile]       = useState(null);
   const [form, setForm]                 = useState({ titre: '', description: '', priorite: 'normale' });
+  const [uploadingRow, setUploadingRow] = useState(null);
+  const photoInputRef                   = useRef(null);
+  const uploadRowIdRef                  = useRef(null);
 
   useEffect(() => { fetchProblemes(); }, []);
 
@@ -157,6 +160,38 @@ function SectionProblemes() {
       setProblemes(prev => prev.filter(p => p.id !== id));
     } catch {
       setError('Impossible de supprimer ce problème.');
+    }
+  }
+
+  function triggerPhotoChange(id) {
+    uploadRowIdRef.current = id;
+    photoInputRef.current.value = '';
+    photoInputRef.current.click();
+  }
+
+  async function handlePhotoChange(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      setError('Le fichier ne doit pas dépasser 10 MB.');
+      return;
+    }
+    const id = uploadRowIdRef.current;
+    setUploadingRow(id);
+    setError('');
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+      const res  = await fetch(CLOUDINARY_AUTO_URL, { method: 'POST', body: formData });
+      const data = await res.json();
+      if (!data.secure_url) throw new Error('Upload échoué.');
+      await api.put(`/api/problemes/${id}`, { photo_url: data.secure_url });
+      setProblemes(prev => prev.map(p => p.id === id ? { ...p, photo_url: data.secure_url } : p));
+    } catch (err) {
+      setError(err.message || 'Erreur lors de l\'upload de la photo.');
+    } finally {
+      setUploadingRow(null);
     }
   }
 
@@ -256,6 +291,14 @@ function SectionProblemes() {
       {loading && <p style={s.loading}>Chargement...</p>}
       {!loading && problemes.length === 0 && <p style={s.empty}>Aucun problème signalé.</p>}
 
+      <input
+        ref={photoInputRef}
+        type="file"
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={handlePhotoChange}
+      />
+
       {problemes.length > 0 && (
         <div style={s.tableWrapper}>
         <table style={s.table}>
@@ -277,9 +320,16 @@ function SectionProblemes() {
                 <td style={s.td}><Badge value={p.statut} /></td>
                 <td style={s.td}><Badge value={p.priorite} /></td>
                 <td style={s.td}>
-                  {p.photo_url
-                    ? <a href={p.photo_url} target="_blank" rel="noreferrer" style={{ color: '#16213e', fontSize: 13 }}>Voir photo</a>
-                    : <span style={{ color: '#aaa', fontSize: 13 }}>—</span>}
+                  {p.photo_url && (
+                    <a href={p.photo_url} target="_blank" rel="noreferrer" style={{ color: '#16213e', fontSize: 13, marginRight: 8 }}>Voir photo</a>
+                  )}
+                  <button
+                    style={{ ...s.btn, background: '#6c757d', color: '#fff', marginRight: 0 }}
+                    onClick={() => triggerPhotoChange(p.id)}
+                    disabled={uploadingRow === p.id}
+                  >
+                    {uploadingRow === p.id ? '...' : p.photo_url ? 'Changer la photo' : 'Ajouter une photo'}
+                  </button>
                 </td>
                 <td style={s.td}>
                   <button
