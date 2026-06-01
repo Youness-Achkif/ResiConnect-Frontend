@@ -691,9 +691,11 @@ function SectionMessages({ onRead }) {
   const prevThreadCountRef        = useRef(0);
   const selectedIdRef             = useRef(null);
   const [showNewBadge, setShowNewBadge] = useState(false);
+  const [residents, setResidents]       = useState([]);
 
   useEffect(() => {
     fetchMessages(true);
+    api.get('/api/residents').then(({ data }) => setResidents(data)).catch(() => {});
     const id = setInterval(() => fetchMessages(false), 3000);
     return () => clearInterval(id);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -771,18 +773,37 @@ function SectionMessages({ onRead }) {
     }
   }
 
-  const conversations = [];
-  const seen = new Set();
+  async function handleDeleteConversation(e, id, nom) {
+    e.stopPropagation();
+    if (!window.confirm(`Supprimer toute la conversation avec ${nom} ?`)) return;
+    try {
+      await api.delete(`/api/messages/conversation/${id}`);
+      setMessages(prev => prev.filter(m => m.expediteur_id !== id && m.destinataire_id !== id));
+    } catch {
+      setError('Impossible de supprimer la conversation.');
+    }
+  }
+
+  const msgMap = new Map();
   [...messages]
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
     .forEach(m => {
-      const otherId  = m.expediteur_id === user?.id ? m.destinataire_id  : m.expediteur_id;
-      const otherNom = m.expediteur_id === user?.id ? (m.destinataire_nom ?? '—') : (m.expediteur_nom ?? '—');
-      if (!seen.has(otherId)) {
-        seen.add(otherId);
+      const otherId = m.expediteur_id === user?.id ? m.destinataire_id : m.expediteur_id;
+      if (!msgMap.has(otherId)) {
         const unread = messages.filter(msg => msg.expediteur_id === otherId && !msg.lu).length;
-        conversations.push({ id: otherId, nom: otherNom, unread, last: m });
+        msgMap.set(otherId, { unread, last: m });
       }
+    });
+  const conversations = residents
+    .map(r => {
+      const msgData = msgMap.get(r.id);
+      return { id: r.id, nom: r.nom || r.email || '—', unread: msgData?.unread ?? 0, last: msgData?.last ?? null };
+    })
+    .sort((a, b) => {
+      if (a.last && b.last) return new Date(b.last.created_at) - new Date(a.last.created_at);
+      if (a.last) return -1;
+      if (b.last) return 1;
+      return (a.nom || '').localeCompare(b.nom || '');
     });
 
   const thread = selectedId
@@ -841,11 +862,17 @@ function SectionMessages({ onRead }) {
               {conversations.length === 0 && <p style={s.empty}>Aucun message.</p>}
               {conversations.map(c => (
                 <div key={c.id} onClick={() => setSelectedId(c.id)} style={{ padding: '12px 8px', borderBottom: '1px solid #eee', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
+                  <div style={{ overflow: 'hidden', flex: 1 }}>
                     <div style={{ fontWeight: c.unread > 0 ? '700' : '400', fontSize: 15 }}>{c.nom}</div>
-                    <div style={{ fontSize: 13, color: '#888', marginTop: 2 }}>{c.last.contenu.slice(0, 40)}{c.last.contenu.length > 40 ? '…' : ''}</div>
+                    <div style={{ fontSize: 13, color: '#888', marginTop: 2 }}>{c.last ? (c.last.contenu.slice(0, 40) + (c.last.contenu.length > 40 ? '…' : '')) : 'Aucun message'}</div>
                   </div>
-                  {c.unread > 0 && <span style={{ background: '#dc3545', color: '#fff', borderRadius: 10, padding: '2px 8px', fontSize: 12, fontWeight: '700' }}>{c.unread}</span>}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                    {c.unread > 0 && <span style={{ background: '#dc3545', color: '#fff', borderRadius: 10, padding: '2px 8px', fontSize: 12, fontWeight: '700' }}>{c.unread}</span>}
+                    <button
+                      onClick={e => handleDeleteConversation(e, c.id, c.nom)}
+                      style={{ background: '#dc3545', color: '#fff', border: 'none', borderRadius: 4, padding: '4px 8px', fontSize: 12, cursor: 'pointer' }}
+                    >🗑️ Supprimer</button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -857,11 +884,18 @@ function SectionMessages({ onRead }) {
               {conversations.length === 0 && <p style={s.empty}>Aucun message.</p>}
               {conversations.map(c => (
                 <div key={c.id} onClick={() => setSelectedId(c.id)} style={{ padding: '10px 8px', borderRadius: 6, cursor: 'pointer', marginBottom: 4, background: selectedId === c.id ? '#f0f2f5' : 'transparent', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ overflow: 'hidden' }}>
+                  <div style={{ overflow: 'hidden', flex: 1 }}>
                     <div style={{ fontWeight: c.unread > 0 ? '700' : '400', fontSize: 14 }}>{c.nom}</div>
-                    <div style={{ fontSize: 12, color: '#888', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.last.contenu.slice(0, 28)}{c.last.contenu.length > 28 ? '…' : ''}</div>
+                    <div style={{ fontSize: 12, color: '#888', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.last ? (c.last.contenu.slice(0, 28) + (c.last.contenu.length > 28 ? '…' : '')) : 'Aucun message'}</div>
                   </div>
-                  {c.unread > 0 && <span style={{ background: '#dc3545', color: '#fff', borderRadius: 10, padding: '1px 7px', fontSize: 11, fontWeight: '700', flexShrink: 0, marginLeft: 6 }}>{c.unread}</span>}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, marginLeft: 6 }}>
+                    {c.unread > 0 && <span style={{ background: '#dc3545', color: '#fff', borderRadius: 10, padding: '1px 7px', fontSize: 11, fontWeight: '700' }}>{c.unread}</span>}
+                    <button
+                      onClick={e => handleDeleteConversation(e, c.id, c.nom)}
+                      title={`Supprimer la conversation avec ${c.nom}`}
+                      style={{ background: '#dc3545', color: '#fff', border: 'none', borderRadius: 4, padding: '3px 6px', fontSize: 12, cursor: 'pointer', lineHeight: 1 }}
+                    >🗑️</button>
+                  </div>
                 </div>
               ))}
             </div>
