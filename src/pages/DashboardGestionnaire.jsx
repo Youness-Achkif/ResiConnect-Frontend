@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
-import { CLOUDINARY_IMAGE_URL, CLOUDINARY_RAW_URL, CLOUDINARY_AUTO_URL, CLOUDINARY_UPLOAD_PRESET } from '../config/cloudinary';
+import { CLOUDINARY_IMAGE_URL, CLOUDINARY_RAW_URL, CLOUDINARY_UPLOAD_PRESET } from '../config/cloudinary';
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
