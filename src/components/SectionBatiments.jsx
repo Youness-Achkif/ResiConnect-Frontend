@@ -24,6 +24,7 @@ export default function SectionBatiments({ residenceId }) {
   const [nom, setNom]               = useState('');
   const [submitting, setSubmitting] = useState(false);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { if (residenceId) load(); }, [residenceId]);
 
   async function load() {
