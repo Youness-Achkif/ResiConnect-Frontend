@@ -33,12 +33,12 @@ export default function SectionAppartements({ residenceId }) {
   const [assigningId, setAssigningId]   = useState(null);
   const [assignUserId, setAssignUserId] = useState('');
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!residenceId) return;
     load();
     api.get(`/api/residences/${residenceId}/batiments`).then(r => setBatiments(r.data)).catch(() => {});
     api.get(`/api/residents?residence_id=${residenceId}`).then(r => setResidents(r.data)).catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [residenceId]);
 
   async function load() {
