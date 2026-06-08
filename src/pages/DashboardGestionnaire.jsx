@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { CLOUDINARY_IMAGE_URL, CLOUDINARY_RAW_URL, CLOUDINARY_UPLOAD_PRESET } from '../config/cloudinary';
+import SectionResidences from '../components/SectionResidences';
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
@@ -54,6 +55,7 @@ const s = {
 
 const BADGE_COLORS = {
   payé:           { background: 'rgba(34,197,94,0.15)',   color: '#4ade80',  border: '1px solid rgba(34,197,94,0.3)' },
+  actif:          { background: 'rgba(34,197,94,0.15)',   color: '#4ade80',  border: '1px solid rgba(34,197,94,0.3)' },
   'en attente':   { background: 'rgba(245,158,11,0.15)',  color: '#fbbf24',  border: '1px solid rgba(245,158,11,0.3)' },
   refusé:         { background: 'rgba(239,68,68,0.15)',   color: '#f87171',  border: '1px solid rgba(239,68,68,0.3)' },
   ouvert:         { background: 'rgba(99,102,241,0.15)',  color: '#a5b4fc',  border: '1px solid rgba(99,102,241,0.3)' },
@@ -73,20 +75,39 @@ function Badge({ value }) {
 // ─── Section Résidents ────────────────────────────────────────────────────────
 
 function SectionResidents() {
-  const [residents, setResidents]   = useState([]);
-  const [loading, setLoading]       = useState(false);
-  const [error, setError]           = useState('');
-  const [showForm, setShowForm]     = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [form, setForm]             = useState({ nom: '', email: '', mot_de_passe: '' });
+  const { selectedResidence } = useAuth();
+  const [residents, setResidents]       = useState([]);
+  const [appartements, setAppartements] = useState([]);
+  const [loading, setLoading]           = useState(false);
+  const [error, setError]               = useState('');
+  const [success, setSuccess]           = useState('');
+  const [showForm, setShowForm]         = useState(false);
+  const [submitting, setSubmitting]     = useState(false);
+  const [form, setForm]                 = useState({ nom: '', email: '', appartement_id: '' });
 
-  useEffect(() => { fetchResidents(); }, []);
+  useEffect(() => {
+    fetchResidents();
+    if (selectedResidence?.id) {
+      api.get(`/api/residences/${selectedResidence.id}/appartements`)
+        .then(({ data }) => {
+          const free = data.filter(a => !a.user_id && !a.resident_nom && !a.user?.id);
+          setAppartements(free);
+        })
+        .catch(() => {});
+    } else {
+      setAppartements([]);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedResidence?.id]);
 
   async function fetchResidents() {
     setLoading(true);
     setError('');
     try {
-      const { data } = await api.get('/api/residents');
+      const url = selectedResidence?.id
+        ? `/api/residents?residence_id=${selectedResidence.id}`
+        : '/api/residents';
+      const { data } = await api.get(url);
       setResidents(data);
     } catch {
       setError('Impossible de charger les résidents.');
@@ -95,17 +116,24 @@ function SectionResidents() {
     }
   }
 
-  async function handleCreate(e) {
+  async function handleInvite(e) {
     e.preventDefault();
     setSubmitting(true);
     setError('');
+    setSuccess('');
     try {
-      await api.post('/api/auth/register', { ...form, role: 'resident' });
-      setForm({ nom: '', email: '', mot_de_passe: '' });
+      await api.post('/api/auth/invite-resident', {
+        nom: form.nom,
+        email: form.email,
+        appartement_id: form.appartement_id ? parseInt(form.appartement_id, 10) : undefined,
+        residence_id: selectedResidence?.id,
+      });
+      setSuccess(`Invitation envoyée à ${form.email}`);
+      setForm({ nom: '', email: '', appartement_id: '' });
       setShowForm(false);
       fetchResidents();
     } catch (err) {
-      setError(err.response?.data?.message || 'Erreur lors de la création.');
+      setError(err.response?.data?.message || 'Erreur lors de l\'invitation.');
     } finally {
       setSubmitting(false);
     }
@@ -126,29 +154,46 @@ function SectionResidents() {
     <div style={s.card}>
       <div style={s.cardHead}>
         <h2 style={s.h2}>Résidents</h2>
-        <button style={{ ...s.btn, ...s.btnPrimary }} onClick={() => setShowForm(v => !v)}>
-          {showForm ? 'Annuler' : '+ Nouveau résident'}
+        <button style={{ ...s.btn, ...s.btnPrimary }} onClick={() => { setShowForm(v => !v); setSuccess(''); setError(''); }}>
+          {showForm ? 'Annuler' : '+ Inviter un résident'}
         </button>
       </div>
 
       {showForm && (
-        <form onSubmit={handleCreate} style={s.formPanel}>
+        <form onSubmit={handleInvite} style={s.formPanel}>
           <div style={s.formRow}>
             <label style={s.label}>Nom complet</label>
-            <input style={s.input} value={form.nom} onChange={e => setForm({ ...form, nom: e.target.value })} required />
+            <input style={s.input} value={form.nom} onChange={e => setForm({ ...form, nom: e.target.value })} required placeholder="Prénom Nom" />
           </div>
           <div style={s.formRow}>
             <label style={s.label}>Email</label>
-            <input type="email" style={s.input} value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required />
+            <input type="email" style={s.input} value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required placeholder="resident@email.com" />
           </div>
           <div style={s.formRow}>
-            <label style={s.label}>Mot de passe</label>
-            <input type="password" style={s.input} value={form.mot_de_passe} onChange={e => setForm({ ...form, mot_de_passe: e.target.value })} required />
+            <label style={s.label}>Appartement (optionnel)</label>
+            <select style={{ ...s.select, width: '100%' }} value={form.appartement_id} onChange={e => setForm({ ...form, appartement_id: e.target.value })}>
+              <option value="">— Aucun appartement —</option>
+              {appartements.map(a => (
+                <option key={a.id} value={a.id}>
+                  {a.numero}{a.batiment_nom ? ` — ${a.batiment_nom}` : ''}
+                </option>
+              ))}
+            </select>
           </div>
           <button type="submit" style={{ ...s.btn, ...s.btnPrimary }} disabled={submitting}>
-            {submitting ? 'Création...' : 'Créer'}
+            {submitting ? 'Envoi...' : 'Envoyer l\'invitation'}
           </button>
         </form>
+      )}
+
+      {success && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.3)', borderRadius: 8, padding: '10px 14px', marginBottom: 16 }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+            <circle cx="12" cy="12" r="10" stroke="#22c55e" strokeWidth="2"/>
+            <polyline points="9,12 11,14 15,10" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <p style={{ margin: 0, color: '#4ade80', fontSize: 13 }}>{success}</p>
+        </div>
       )}
 
       {error   && <p style={s.error}>{error}</p>}
@@ -163,6 +208,7 @@ function SectionResidents() {
               <tr>
                 <th style={s.th}>Nom</th>
                 <th style={s.th}>Email</th>
+                <th style={s.th}>Statut</th>
                 <th style={s.th}>Actions</th>
               </tr>
             </thead>
@@ -171,6 +217,7 @@ function SectionResidents() {
                 <tr key={r.id}>
                   <td style={{ ...s.td, color: '#f1f5f9', fontWeight: '500' }}>{r.nom}</td>
                   <td style={s.td}>{r.email}</td>
+                  <td style={s.td}><Badge value={r.is_active ? 'actif' : 'en attente'} /></td>
                   <td style={s.td}>
                     <button style={{ ...s.btn, ...s.btnDanger }} onClick={() => handleDelete(r.id)}>
                       Supprimer
@@ -191,27 +238,35 @@ function SectionResidents() {
 const STATUTS_PAIEMENT = ['en attente', 'payé', 'refusé'];
 
 function SectionPaiements() {
-  const [paiements, setPaiements]   = useState([]);
-  const [residents, setResidents]   = useState([]);
-  const [loading, setLoading]       = useState(false);
-  const [error, setError]           = useState('');
-  const [showForm, setShowForm]     = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [form, setForm]             = useState({ user_id: '', montant: '', date_paiement: '', statut: 'en attente' });
-  const [uploading, setUploading]   = useState(null);
-  const fileInputRef                = useRef(null);
-  const uploadIdRef                 = useRef(null);
+  const { selectedResidence }           = useAuth();
+  const [paiements, setPaiements]       = useState([]);
+  const [residents, setResidents]       = useState([]);
+  const [loading, setLoading]           = useState(false);
+  const [error, setError]               = useState('');
+  const [showForm, setShowForm]         = useState(false);
+  const [submitting, setSubmitting]     = useState(false);
+  const [form, setForm]                 = useState({ user_id: '', montant: '', date_paiement: '', statut: 'en attente' });
+  const [uploading, setUploading]       = useState(null);
+  const fileInputRef                    = useRef(null);
+  const uploadIdRef                     = useRef(null);
 
   useEffect(() => {
     fetchPaiements();
-    api.get('/api/residents').then(({ data }) => setResidents(data)).catch(() => {});
-  }, []);
+    const resUrl = selectedResidence?.id
+      ? `/api/residents?residence_id=${selectedResidence.id}`
+      : '/api/residents';
+    api.get(resUrl).then(({ data }) => setResidents(data)).catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedResidence?.id]);
 
   async function fetchPaiements() {
     setLoading(true);
     setError('');
     try {
-      const { data } = await api.get('/api/paiements');
+      const url = selectedResidence?.id
+        ? `/api/paiements?residence_id=${selectedResidence.id}`
+        : '/api/paiements';
+      const { data } = await api.get(url);
       setPaiements(data);
     } catch {
       setError('Impossible de charger les paiements.');
@@ -370,11 +425,7 @@ function SectionPaiements() {
                   <td style={s.td}>{p.date_paiement ? new Date(p.date_paiement).toLocaleDateString('fr-FR') : '—'}</td>
                   <td style={s.td}><Badge value={p.statut} /></td>
                   <td style={s.td}>
-                    <select
-                      style={s.select}
-                      value={p.statut}
-                      onChange={e => handleStatutChange(p.id, e.target.value)}
-                    >
+                    <select style={s.select} value={p.statut} onChange={e => handleStatutChange(p.id, e.target.value)}>
                       {STATUTS_PAIEMENT.map(st => <option key={st} value={st}>{st}</option>)}
                     </select>
                   </td>
@@ -410,16 +461,21 @@ function SectionPaiements() {
 const STATUTS_PROBLEME = ['ouvert', 'en cours', 'résolu'];
 
 function SectionProblemes() {
+  const { selectedResidence }     = useAuth();
   const [problemes, setProblemes] = useState([]);
   const [loading, setLoading]     = useState(false);
   const [error, setError]         = useState('');
-  useEffect(() => { fetchProblemes(); }, []);
+
+  useEffect(() => { fetchProblemes(); }, [selectedResidence?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function fetchProblemes() {
     setLoading(true);
     setError('');
     try {
-      const { data } = await api.get('/api/problemes');
+      const url = selectedResidence?.id
+        ? `/api/problemes?residence_id=${selectedResidence.id}`
+        : '/api/problemes';
+      const { data } = await api.get(url);
       setProblemes(data);
     } catch {
       setError('Impossible de charger les problèmes.');
@@ -477,11 +533,7 @@ function SectionProblemes() {
                       : <span style={{ color: '#334155', fontSize: 13 }}>—</span>}
                   </td>
                   <td style={s.td}>
-                    <select
-                      style={s.select}
-                      value={p.statut}
-                      onChange={e => handleUpdate(p.id, { statut: e.target.value })}
-                    >
+                    <select style={s.select} value={p.statut} onChange={e => handleUpdate(p.id, { statut: e.target.value })}>
                       {STATUTS_PROBLEME.map(st => <option key={st} value={st}>{st}</option>)}
                     </select>
                   </td>
@@ -498,6 +550,7 @@ function SectionProblemes() {
 // ─── Section Annonces ─────────────────────────────────────────────────────────
 
 function SectionAnnonces() {
+  const { selectedResidence }       = useAuth();
   const [annonces, setAnnonces]     = useState([]);
   const [loading, setLoading]       = useState(false);
   const [error, setError]           = useState('');
@@ -505,13 +558,16 @@ function SectionAnnonces() {
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm]             = useState({ titre: '', contenu: '' });
 
-  useEffect(() => { fetchAnnonces(); }, []);
+  useEffect(() => { fetchAnnonces(); }, [selectedResidence?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function fetchAnnonces() {
     setLoading(true);
     setError('');
     try {
-      const { data } = await api.get('/api/annonces');
+      const url = selectedResidence?.id
+        ? `/api/annonces?residence_id=${selectedResidence.id}`
+        : '/api/annonces';
+      const { data } = await api.get(url);
       setAnnonces(data);
     } catch {
       setError('Impossible de charger les annonces.');
@@ -525,7 +581,10 @@ function SectionAnnonces() {
     setSubmitting(true);
     setError('');
     try {
-      await api.post('/api/annonces', form);
+      await api.post('/api/annonces', {
+        ...form,
+        ...(selectedResidence?.id && { residence_id: selectedResidence.id }),
+      });
       setForm({ titre: '', contenu: '' });
       setShowForm(false);
       fetchAnnonces();
@@ -617,29 +676,32 @@ function SectionAnnonces() {
 // ─── Section Messages ─────────────────────────────────────────────────────────
 
 function SectionMessages({ onRead }) {
-  const [messages, setMessages]       = useState([]);
-  const [loading, setLoading]         = useState(false);
-  const [error, setError]             = useState('');
-  const [selectedId, setSelectedId]   = useState(null);
-  const [reply, setReply]             = useState('');
-  const [sending, setSending]         = useState(false);
-  const { user }                      = useAuth();
-  const isMobile                      = useIsMobile();
-  const bottomRef                     = useRef(null);
-  const messagesContainerRef          = useRef(null);
-  const shouldScrollRef               = useRef(false);
-  const prevThreadCountRef            = useRef(0);
-  const selectedIdRef                 = useRef(null);
+  const { user, selectedResidence }    = useAuth();
+  const [messages, setMessages]        = useState([]);
+  const [loading, setLoading]          = useState(false);
+  const [error, setError]              = useState('');
+  const [selectedId, setSelectedId]    = useState(null);
+  const [reply, setReply]              = useState('');
+  const [sending, setSending]          = useState(false);
+  const isMobile                       = useIsMobile();
+  const bottomRef                      = useRef(null);
+  const messagesContainerRef           = useRef(null);
+  const shouldScrollRef                = useRef(false);
+  const prevThreadCountRef             = useRef(0);
+  const selectedIdRef                  = useRef(null);
   const [showNewBadge, setShowNewBadge] = useState(false);
   const [residents, setResidents]       = useState([]);
 
   useEffect(() => {
     fetchMessages(true);
-    api.get('/api/residents').then(({ data }) => setResidents(data)).catch(() => {});
+    const resUrl = selectedResidence?.id
+      ? `/api/residents?residence_id=${selectedResidence.id}`
+      : '/api/residents';
+    api.get(resUrl).then(({ data }) => setResidents(data)).catch(() => {});
     const id = setInterval(() => fetchMessages(false), 3000);
     return () => clearInterval(id);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [selectedResidence?.id]);
 
   useEffect(() => { selectedIdRef.current = selectedId; }, [selectedId]);
 
@@ -672,7 +734,10 @@ function SectionMessages({ onRead }) {
     if (isInitial) setLoading(true);
     setError('');
     try {
-      const { data } = await api.get('/api/messages');
+      const url = selectedResidence?.id
+        ? `/api/messages?residence_id=${selectedResidence.id}`
+        : '/api/messages';
+      const { data } = await api.get(url);
       const curId = selectedIdRef.current;
       const newThread = curId
         ? data.filter(m => m.expediteur_id === curId || m.destinataire_id === curId)
@@ -766,7 +831,6 @@ function SectionMessages({ onRead }) {
 
       {!loading && (
         isMobile ? (
-          /* ── Mobile : une colonne, liste OU thread ── */
           selectedId ? (
             <div style={{ display: 'flex', flexDirection: 'column', height: 500 }}>
               <button
@@ -821,7 +885,6 @@ function SectionMessages({ onRead }) {
             </div>
           )
         ) : (
-          /* ── Desktop : deux colonnes ── */
           <div style={{ display: 'flex', gap: 0, height: 460 }}>
             <div style={{ width: 230, borderRight: '1px solid rgba(255,255,255,0.07)', overflowY: 'auto', paddingRight: 0, flexShrink: 0 }}>
               {conversations.length === 0 && <p style={s.empty}>Aucun message.</p>}
@@ -892,10 +955,11 @@ const TABS = [
   { key: 'problemes', label: 'Problèmes' },
   { key: 'annonces',  label: 'Annonces'  },
   { key: 'messages',  label: 'Messages'  },
+  { key: 'residences', label: '⚙️ Résidences' },
 ];
 
 export default function DashboardGestionnaire() {
-  const { user, logout }  = useAuth();
+  const { user, logout, residences, selectedResidence, setSelectedResidence } = useAuth();
   const isMobile          = useIsMobile();
   const [activeTab, setActiveTab] = useState(
     () => localStorage.getItem('activeTab') || 'residents'
@@ -903,12 +967,20 @@ export default function DashboardGestionnaire() {
   const [menuOpen, setMenuOpen]       = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
+  // FE-G9 : si aucune résidence, aller sur l'onglet résidences
   useEffect(() => {
-    const fetch = () => api.get('/api/messages')
+    if (residences.length === 0) {
+      setActiveTab('residences');
+      localStorage.setItem('activeTab', 'residences');
+    }
+  }, [residences.length]);
+
+  useEffect(() => {
+    const fetchUnread = () => api.get('/api/messages')
       .then(({ data }) => setUnreadCount(data.filter(m => !m.lu).length))
       .catch(() => {});
-    fetch();
-    const id = setInterval(fetch, 3000);
+    fetchUnread();
+    const id = setInterval(fetchUnread, 3000);
     return () => clearInterval(id);
   }, []);
 
@@ -940,6 +1012,34 @@ export default function DashboardGestionnaire() {
           </div>
           <span style={s.navTitle}>ResiConnect</span>
         </div>
+
+        {/* Residence selector */}
+        <select
+          value={selectedResidence?.id || ''}
+          onChange={e => {
+            const res = residences.find(r => r.id === parseInt(e.target.value, 10));
+            if (res) setSelectedResidence(res);
+          }}
+          style={{
+            background: '#1a1d27',
+            color: residences.length === 0 ? '#475569' : '#e2e8f0',
+            border: '1px solid rgba(255,255,255,0.12)',
+            borderRadius: 8,
+            padding: '6px 10px',
+            fontSize: 13,
+            cursor: residences.length === 0 ? 'default' : 'pointer',
+            outline: 'none',
+            fontFamily: 'inherit',
+            maxWidth: 160,
+            flexShrink: 0,
+          }}
+          disabled={residences.length === 0}
+        >
+          {residences.length === 0
+            ? <option value="">Aucune résidence</option>
+            : residences.map(r => <option key={r.id} value={r.id}>{r.nom}</option>)
+          }
+        </select>
 
         {isMobile ? (
           <button style={s.hamburger} onClick={() => setMenuOpen(v => !v)} aria-label="Menu">
@@ -990,6 +1090,7 @@ export default function DashboardGestionnaire() {
         {activeTab === 'problemes'  && <SectionProblemes />}
         {activeTab === 'annonces'   && <SectionAnnonces />}
         {activeTab === 'messages'   && <SectionMessages onRead={() => setUnreadCount(0)} />}
+        {activeTab === 'residences' && <SectionResidences welcomeMode={residences.length === 0} />}
       </div>
     </div>
   );
