@@ -33,6 +33,7 @@ export default function SectionAppartements({ residenceId }) {
   const [assigningId, setAssigningId]   = useState(null);
   const [assignUserId, setAssignUserId] = useState('');
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!residenceId) return;
     load();
