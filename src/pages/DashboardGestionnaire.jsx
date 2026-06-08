@@ -1003,13 +1003,20 @@ const TABS = [
 ];
 
 export default function DashboardGestionnaire() {
-  const { user, logout, residences, selectedResidence, setSelectedResidence } = useAuth();
+  const { user, logout, residences, selectedResidence, setSelectedResidence, refreshResidences } = useAuth();
   const isMobile          = useIsMobile();
   const [activeTab, setActiveTab] = useState(
     () => localStorage.getItem('activeTab') || 'residents'
   );
   const [menuOpen, setMenuOpen]       = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (user && user.role === 'gestionnaire') {
+      refreshResidences();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // FE-G9 : si aucune résidence, aller sur l'onglet résidences
   useEffect(() => {
