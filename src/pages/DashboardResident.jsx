@@ -463,7 +463,7 @@ function SectionAnnonces() {
 
 // ─── Section Messages ─────────────────────────────────────────────────────────
 
-function SectionMessages() {
+function SectionMessages({ residenceId }) {
   const [messages, setMessages]             = useState([]);
   const [loading, setLoading]               = useState(false);
   const [error, setError]                   = useState('');
@@ -479,13 +479,17 @@ function SectionMessages() {
 
   useEffect(() => {
     fetchMessages(true);
-    api.get('/api/auth/gestionnaire')
-      .then(({ data }) => setGestionnaireId(data.id))
-      .catch(() => setError('Impossible de récupérer le destinataire.'));
     const id = setInterval(() => fetchMessages(false), 3000);
     return () => clearInterval(id);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!residenceId) return;
+    api.get(`/api/auth/gestionnaire/${residenceId}`)
+      .then(({ data }) => setGestionnaireId(data.id))
+      .catch(() => setError('Impossible de récupérer le destinataire.'));
+  }, [residenceId]);
 
   useEffect(() => {
     if (shouldScrollRef.current) {
@@ -714,7 +718,7 @@ export default function DashboardResident() {
         {activeTab === 'paiements' && <SectionPaiements />}
         {activeTab === 'problemes' && <SectionProblemes />}
         {activeTab === 'annonces'  && <SectionAnnonces />}
-        {activeTab === 'messages'  && <SectionMessages />}
+        {activeTab === 'messages'  && <SectionMessages residenceId={residentInfo?.residence_id} />}
       </div>
     </div>
   );
