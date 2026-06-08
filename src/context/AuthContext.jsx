@@ -46,6 +46,23 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const refreshResidences = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/residences`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setResidences(data);
+        if (!selectedResidence && data.length === 1) {
+          setSelectedResidence(data[0]);
+        }
+      }
+    } catch {}
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -58,7 +75,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider value={{
-      token, user, login, logout,
+      token, user, login, logout, refreshResidences,
       residences, selectedResidence, setSelectedResidence,
     }}>
       {children}

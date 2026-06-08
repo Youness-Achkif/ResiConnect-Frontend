@@ -75,30 +75,22 @@ function Badge({ value }) {
 // ─── Section Résidents ────────────────────────────────────────────────────────
 
 function SectionResidents() {
-  const { selectedResidence } = useAuth();
-  const [residents, setResidents]       = useState([]);
-  const [appartements, setAppartements] = useState([]);
-  const [loading, setLoading]           = useState(false);
-  const [error, setError]               = useState('');
-  const [success, setSuccess]           = useState('');
-  const [showForm, setShowForm]         = useState(false);
-  const [submitting, setSubmitting]     = useState(false);
-  const [form, setForm]                 = useState({ nom: '', email: '', appartement_id: '' });
+  const { selectedResidence, residences: allResidences } = useAuth();
+  const [residents, setResidents]                   = useState([]);
+  const [loading, setLoading]                       = useState(false);
+  const [error, setError]                           = useState('');
+  const [success, setSuccess]                       = useState('');
+  const [showForm, setShowForm]                     = useState(false);
+  const [submitting, setSubmitting]                 = useState(false);
+  const [form, setForm]                             = useState({ nom: '', email: '' });
+  const [inviteResId, setInviteResId]               = useState('');
+  const [inviteBatiments, setInviteBatiments]       = useState([]);
+  const [inviteBatId, setInviteBatId]               = useState('');
+  const [inviteAptId, setInviteAptId]               = useState('');
+  const [inviteAppartements, setInviteAppartements] = useState([]);
 
-  useEffect(() => {
-    fetchResidents();
-    if (selectedResidence?.id) {
-      api.get(`/api/residences/${selectedResidence.id}/appartements`)
-        .then(({ data }) => {
-          const free = data.filter(a => !a.user_id && !a.resident_nom && !a.user?.id);
-          setAppartements(free);
-        })
-        .catch(() => {});
-    } else {
-      setAppartements([]);
-    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedResidence?.id]);
+  useEffect(() => { fetchResidents(); }, [selectedResidence?.id]);
 
   async function fetchResidents() {
     setLoading(true);
@@ -116,6 +108,38 @@ function SectionResidents() {
     }
   }
 
+  function resetInviteForm() {
+    setForm({ nom: '', email: '' });
+    setInviteResId('');
+    setInviteBatId('');
+    setInviteAptId('');
+    setInviteBatiments([]);
+    setInviteAppartements([]);
+  }
+
+  async function handleInviteResChange(resId) {
+    setInviteResId(resId);
+    setInviteBatId('');
+    setInviteAptId('');
+    setInviteBatiments([]);
+    setInviteAppartements([]);
+    if (!resId) return;
+    try {
+      const { data } = await api.get(`/api/residences/${resId}/batiments`);
+      setInviteBatiments(data);
+    } catch {}
+  }
+
+  async function handleInviteBatChange(batId) {
+    setInviteBatId(batId);
+    setInviteAptId('');
+    if (!batId || !inviteResId) return;
+    try {
+      const { data } = await api.get(`/api/residences/${inviteResId}/appartements`);
+      setInviteAppartements(data.filter(a => !a.user_id && !a.resident_nom && !a.user?.id));
+    } catch {}
+  }
+
   async function handleInvite(e) {
     e.preventDefault();
     setSubmitting(true);
@@ -125,15 +149,15 @@ function SectionResidents() {
       await api.post('/api/auth/invite-resident', {
         nom: form.nom,
         email: form.email,
-        appartement_id: form.appartement_id ? parseInt(form.appartement_id, 10) : undefined,
-        residence_id: selectedResidence?.id,
+        ...(inviteAptId && { appartement_id: parseInt(inviteAptId, 10) }),
+        ...(inviteResId && { residence_id: parseInt(inviteResId, 10) }),
       });
       setSuccess(`Invitation envoyée à ${form.email}`);
-      setForm({ nom: '', email: '', appartement_id: '' });
+      resetInviteForm();
       setShowForm(false);
       fetchResidents();
     } catch (err) {
-      setError(err.response?.data?.message || 'Erreur lors de l\'invitation.');
+      setError(err.response?.data?.message || "Erreur lors de l'invitation.");
     } finally {
       setSubmitting(false);
     }
@@ -154,7 +178,7 @@ function SectionResidents() {
     <div style={s.card}>
       <div style={s.cardHead}>
         <h2 style={s.h2}>Résidents</h2>
-        <button style={{ ...s.btn, ...s.btnPrimary }} onClick={() => { setShowForm(v => !v); setSuccess(''); setError(''); }}>
+        <button style={{ ...s.btn, ...s.btnPrimary }} onClick={() => { const closing = showForm; setShowForm(v => !v); setSuccess(''); setError(''); if (closing) resetInviteForm(); }}>
           {showForm ? 'Annuler' : '+ Inviter un résident'}
         </button>
       </div>
@@ -170,18 +194,38 @@ function SectionResidents() {
             <input type="email" style={s.input} value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required placeholder="resident@email.com" />
           </div>
           <div style={s.formRow}>
-            <label style={s.label}>Appartement (optionnel)</label>
-            <select style={{ ...s.select, width: '100%' }} value={form.appartement_id} onChange={e => setForm({ ...form, appartement_id: e.target.value })}>
-              <option value="">— Aucun appartement —</option>
-              {appartements.map(a => (
-                <option key={a.id} value={a.id}>
-                  {a.numero}{a.batiment_nom ? ` — ${a.batiment_nom}` : ''}
-                </option>
-              ))}
+            <label style={s.label}>Résidence</label>
+            <select style={{ ...s.select, width: '100%' }} value={inviteResId} onChange={e => handleInviteResChange(e.target.value)}>
+              <option value="">— Choisir une résidence —</option>
+              {allResidences.map(r => <option key={r.id} value={r.id}>{r.nom}</option>)}
             </select>
           </div>
+          {inviteResId && (
+            <div style={s.formRow}>
+              <label style={s.label}>Bâtiment</label>
+              <select style={{ ...s.select, width: '100%' }} value={inviteBatId} onChange={e => handleInviteBatChange(e.target.value)}>
+                <option value="">— Choisir un bâtiment —</option>
+                {inviteBatiments.map(b => <option key={b.id} value={b.id}>{b.nom}</option>)}
+              </select>
+            </div>
+          )}
+          {inviteBatId && (
+            <div style={s.formRow}>
+              <label style={s.label}>Appartement</label>
+              <select style={{ ...s.select, width: '100%' }} value={inviteAptId} onChange={e => setInviteAptId(e.target.value)}>
+                <option value="">— Choisir un appartement —</option>
+                {inviteAppartements
+                  .filter(a => a.batiment_id === parseInt(inviteBatId, 10))
+                  .map(a => (
+                    <option key={a.id} value={a.id}>
+                      {a.numero}{a.batiment_nom ? ` — ${a.batiment_nom}` : ''}
+                    </option>
+                  ))}
+              </select>
+            </div>
+          )}
           <button type="submit" style={{ ...s.btn, ...s.btnPrimary }} disabled={submitting}>
-            {submitting ? 'Envoi...' : 'Envoyer l\'invitation'}
+            {submitting ? 'Envoi...' : "Envoyer l'invitation"}
           </button>
         </form>
       )}

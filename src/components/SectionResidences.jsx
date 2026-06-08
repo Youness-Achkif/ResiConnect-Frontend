@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import SectionBatiments from './SectionBatiments';
 import SectionAppartements from './SectionAppartements';
 
@@ -30,6 +31,7 @@ const cs = {
 };
 
 export default function SectionResidences({ welcomeMode }) {
+  const { refreshResidences }         = useAuth();
   const [residences, setResidences]   = useState([]);
   const [loading, setLoading]         = useState(false);
   const [error, setError]             = useState('');
@@ -60,13 +62,14 @@ export default function SectionResidences({ welcomeMode }) {
       setForm({ nom: '', adresse: '' });
       setShowForm(false);
       load();
+      refreshResidences();
     } catch (err) { setError(err.response?.data?.message || 'Erreur création.'); }
     finally { setSubmitting(false); }
   }
 
   async function handleDelete(id) {
     if (!window.confirm('Supprimer cette résidence et toutes ses données ?')) return;
-    try { await api.delete(`/api/residences/${id}`); load(); }
+    try { await api.delete(`/api/residences/${id}`); load(); refreshResidences(); }
     catch { setError('Erreur suppression.'); }
   }
 
