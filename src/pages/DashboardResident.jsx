@@ -629,12 +629,17 @@ const TABS = [
 ];
 
 export default function DashboardResident() {
-  const { user, logout } = useAuth();
-  const isMobile         = useIsMobile();
+  const { user, logout }  = useAuth();
+  const isMobile          = useIsMobile();
   const [activeTab, setActiveTab] = useState(
     () => localStorage.getItem('resident_activeTab') || 'paiements'
   );
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen]       = useState(false);
+  const [residentInfo, setResidentInfo] = useState(null);
+
+  useEffect(() => {
+    api.get('/api/auth/me').then(({ data }) => setResidentInfo(data)).catch(() => {});
+  }, []);
 
   function handleTabChange(key) {
     localStorage.setItem('resident_activeTab', key);
@@ -682,6 +687,11 @@ export default function DashboardResident() {
         )}
 
         <span style={s.navSep} />
+        {!isMobile && (
+          <span style={{ fontSize: 12, color: '#a5b4fc', background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: 6, padding: '3px 10px', marginRight: 8, flexShrink: 0, whiteSpace: 'nowrap' }}>
+            {residentInfo?.residence_nom ? `Résidence : ${residentInfo.residence_nom}` : 'Aucune résidence assignée'}
+          </span>
+        )}
         {!isMobile && <span style={{ fontSize: 13, color: '#64748b', marginRight: 10 }}>{user?.nom}</span>}
         <button style={s.logoutBtn} onClick={logout}>Déconnecter</button>
 
