@@ -243,12 +243,20 @@ export default function Login() {
           </button>
         </form>
 
+        {/* Register link */}
+        <p style={{ margin: '20px 0 0', textAlign: 'center', fontSize: 13, color: 'rgba(100,116,139,0.9)' }}>
+          Pas encore de compte ?{' '}
+          <a href="/register" style={{ color: '#a5b4fc', textDecoration: 'none', fontWeight: 500 }}>
+            Créer un compte gestionnaire
+          </a>
+        </p>
+
         {/* Footer */}
         <p style={{
-          margin: '24px 0 0',
+          margin: '14px 0 0',
           textAlign: 'center',
           fontSize: 12,
-          color: 'rgba(100,116,139,0.8)',
+          color: 'rgba(100,116,139,0.5)',
         }}>
           © {new Date().getFullYear()} ResiConnect — Tous droits réservés
         </p>
