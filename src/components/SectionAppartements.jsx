@@ -33,7 +33,6 @@ export default function SectionAppartements({ residenceId }) {
   const [form, setForm]                 = useState({ numero: '', batiment_id: '' });
   const [submitting, setSubmitting]     = useState(false);
   const [assigningId, setAssigningId]   = useState(null);
-  const [assignUserId, setAssignUserId] = useState('');
 
   useEffect(() => {
     if (!residenceId) return;
@@ -79,13 +78,12 @@ export default function SectionAppartements({ residenceId }) {
     } catch (err) { setError(err.response?.data?.message || 'Erreur suppression.'); }
   }
 
-  async function handleAssign(id) {
-    if (!assignUserId) return;
+  async function handleAssign(id, userId) {
+    if (!userId) return;
     setError('');
     try {
-      await api.put(`/api/appartements/${id}`, { user_id: parseInt(assignUserId, 10) });
+      await api.put(`/api/appartements/${id}`, { user_id: parseInt(userId, 10) });
       setAssigningId(null);
-      setAssignUserId('');
       load();
     } catch (err) { setError(err.response?.data?.message || 'Erreur assignation.'); }
   }
@@ -146,18 +144,17 @@ export default function SectionAppartements({ residenceId }) {
                       <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                         <select
                           style={{ ...cs.select, width: 'auto', minWidth: 120 }}
-                          value={assignUserId}
-                          onChange={e => setAssignUserId(e.target.value)}
+                          defaultValue=""
+                          onChange={e => handleAssign(a.id, e.target.value)}
                         >
                           <option value="">— Résident —</option>
                           {residents.map(r => <option key={r.id} value={r.id}>{r.nom}</option>)}
                         </select>
-                        <button style={{ ...cs.btn, ...cs.btnP }} onClick={() => handleAssign(a.id)}>OK</button>
                         <button style={{ ...cs.btn, background: 'transparent', color: '#64748b', border: '1px solid rgba(255,255,255,0.1)' }} onClick={() => setAssigningId(null)}>✕</button>
                       </span>
                     ) : (
                       <span style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-                        <button style={{ ...cs.btn, ...cs.btnAssign }} onClick={() => { setAssigningId(a.id); setAssignUserId(''); }}>
+                        <button style={{ ...cs.btn, ...cs.btnAssign }} onClick={() => setAssigningId(a.id)}>
                           Assigner
                         </button>
                         <button style={{ ...cs.btn, ...cs.btnD }} onClick={() => handleDelete(a.id)}>
