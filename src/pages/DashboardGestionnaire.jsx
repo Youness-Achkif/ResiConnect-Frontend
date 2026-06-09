@@ -999,27 +999,34 @@ const TABS = [
 
 export default function DashboardGestionnaire() {
   const { user, logout, residences, selectedResidence, setSelectedResidence, refreshResidences } = useAuth();
-  const isMobile          = useIsMobile();
-  const [activeTab, setActiveTab] = useState(
-    () => localStorage.getItem('activeTab') || 'residents'
+  const isMobile                      = useIsMobile();
+  const [activeSection, setActiveSection] = useState(
+    () => localStorage.getItem('activeSection') || 'residents'
   );
+  const [isLoadingResidences, setIsLoadingResidences] = useState(true);
   const [menuOpen, setMenuOpen]       = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
+  const setActiveSectionPersisted = (section) => {
+    setActiveSection(section);
+    localStorage.setItem('activeSection', section);
+  };
+
   useEffect(() => {
     if (user && user.role === 'gestionnaire') {
-      refreshResidences();
+      refreshResidences().finally(() => setIsLoadingResidences(false));
+    } else {
+      setIsLoadingResidences(false);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // FE-G9 : si aucune résidence, aller sur l'onglet résidences
+  // FE-G9 : si aucune résidence après chargement, aller sur l'onglet résidences
   useEffect(() => {
-    if (residences.length === 0) {
-      setActiveTab('residences');
-      localStorage.setItem('activeTab', 'residences');
+    if (!isLoadingResidences && residences.length === 0) {
+      setActiveSectionPersisted('residences');
     }
-  }, [residences.length]);
+  }, [residences.length, isLoadingResidences]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const fetchUnread = () => api.get('/api/messages')
@@ -1031,8 +1038,7 @@ export default function DashboardGestionnaire() {
   }, []);
 
   function handleTabChange(key) {
-    localStorage.setItem('activeTab', key);
-    setActiveTab(key);
+    setActiveSectionPersisted(key);
     setMenuOpen(false);
   }
 
@@ -1095,7 +1101,7 @@ export default function DashboardGestionnaire() {
           TABS.map(tab => (
             <button
               key={tab.key}
-              style={activeTab === tab.key ? s.tabActive : s.tab}
+              style={activeSection === tab.key ? s.tabActive : s.tab}
               onClick={() => handleTabChange(tab.key)}
             >
               {tab.label}
@@ -1117,7 +1123,7 @@ export default function DashboardGestionnaire() {
             {TABS.map(tab => (
               <button
                 key={tab.key}
-                style={activeTab === tab.key ? s.mobileTabActive : s.mobileTab}
+                style={activeSection === tab.key ? s.mobileTabActive : s.mobileTab}
                 onClick={() => handleTabChange(tab.key)}
               >
                 {tab.label}
@@ -1131,12 +1137,12 @@ export default function DashboardGestionnaire() {
       </nav>
 
       <div style={s.section}>
-        {activeTab === 'residents'  && <SectionResidents />}
-        {activeTab === 'paiements'  && <SectionPaiements />}
-        {activeTab === 'problemes'  && <SectionProblemes />}
-        {activeTab === 'annonces'   && <SectionAnnonces />}
-        {activeTab === 'messages'   && <SectionMessages onRead={() => setUnreadCount(0)} />}
-        {activeTab === 'residences' && <SectionResidences welcomeMode={residences.length === 0} />}
+        {activeSection === 'residents'  && <SectionResidents />}
+        {activeSection === 'paiements'  && <SectionPaiements />}
+        {activeSection === 'problemes'  && <SectionProblemes />}
+        {activeSection === 'annonces'   && <SectionAnnonces />}
+        {activeSection === 'messages'   && <SectionMessages onRead={() => setUnreadCount(0)} />}
+        {activeSection === 'residences' && <SectionResidences welcomeMode={residences.length === 0} />}
       </div>
     </div>
   );
