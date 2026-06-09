@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 const cs = {
   head:        { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
@@ -22,6 +23,7 @@ const cs = {
 };
 
 export default function SectionAppartements({ residenceId }) {
+  const { refreshResidences }           = useAuth();
   const [appartements, setAppartements] = useState([]);
   const [batiments, setBatiments]       = useState([]);
   const [residents, setResidents]       = useState([]);
@@ -65,6 +67,16 @@ export default function SectionAppartements({ residenceId }) {
       load();
     } catch (err) { setError(err.response?.data?.message || 'Erreur création.'); }
     finally { setSubmitting(false); }
+  }
+
+  async function handleDelete(id) {
+    if (!window.confirm('Supprimer cet appartement ?')) return;
+    setError('');
+    try {
+      await api.delete(`/api/appartements/${id}`);
+      load();
+      refreshResidences();
+    } catch (err) { setError(err.response?.data?.message || 'Erreur suppression.'); }
   }
 
   async function handleAssign(id) {
@@ -144,9 +156,14 @@ export default function SectionAppartements({ residenceId }) {
                         <button style={{ ...cs.btn, background: 'transparent', color: '#64748b', border: '1px solid rgba(255,255,255,0.1)' }} onClick={() => setAssigningId(null)}>✕</button>
                       </span>
                     ) : (
-                      <button style={{ ...cs.btn, ...cs.btnAssign }} onClick={() => { setAssigningId(a.id); setAssignUserId(''); }}>
-                        Assigner
-                      </button>
+                      <span style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                        <button style={{ ...cs.btn, ...cs.btnAssign }} onClick={() => { setAssigningId(a.id); setAssignUserId(''); }}>
+                          Assigner
+                        </button>
+                        <button style={{ ...cs.btn, ...cs.btnD }} onClick={() => handleDelete(a.id)}>
+                          Supprimer
+                        </button>
+                      </span>
                     )}
                   </td>
                 </tr>
