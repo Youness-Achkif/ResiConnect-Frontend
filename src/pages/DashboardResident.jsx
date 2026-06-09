@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { CLOUDINARY_AUTO_URL, CLOUDINARY_UPLOAD_PRESET } from '../config/cloudinary';
@@ -634,6 +635,7 @@ const TABS = [
 
 export default function DashboardResident() {
   const { user, logout }  = useAuth();
+  const navigate          = useNavigate();
   const isMobile          = useIsMobile();
   const [activeTab, setActiveTab] = useState(
     () => localStorage.getItem('resident_activeTab') || 'paiements'
@@ -715,6 +717,19 @@ export default function DashboardResident() {
       </nav>
 
       <div style={s.section}>
+        {residentInfo !== null && !residentInfo.residence_id && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.3)', borderRadius: 12, padding: '14px 20px', marginBottom: 20 }}>
+            <span style={{ fontSize: 14, color: '#a5b4fc' }}>
+              Vous n'êtes assigné à aucune résidence.
+            </span>
+            <button
+              onClick={() => navigate('/join-residence')}
+              style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 2px 10px rgba(99,102,241,0.35)', whiteSpace: 'nowrap' }}
+            >
+              Rejoindre une résidence →
+            </button>
+          </div>
+        )}
         {activeTab === 'paiements' && <SectionPaiements />}
         {activeTab === 'problemes' && <SectionProblemes />}
         {activeTab === 'annonces'  && <SectionAnnonces />}

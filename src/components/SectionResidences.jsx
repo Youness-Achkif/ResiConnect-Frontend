@@ -40,6 +40,14 @@ export default function SectionResidences({ welcomeMode }) {
   const [submitting, setSubmitting]   = useState(false);
   const [expandedId, setExpandedId]   = useState(null);
   const [expandedSection, setExpandedSection] = useState('batiments');
+  const [copiedId, setCopiedId]       = useState(null);
+
+  function handleCopy(code, id) {
+    navigator.clipboard.writeText(code).then(() => {
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    }).catch(() => {});
+  }
 
   useEffect(() => { load(); }, []);
 
@@ -130,6 +138,21 @@ export default function SectionResidences({ welcomeMode }) {
             {r.nb_appartements != null && <div style={cs.stat}><div style={cs.statVal}>{r.nb_appartements}</div><div style={cs.statLbl}>Appartements</div></div>}
             {r.nb_residents    != null && <div style={cs.stat}><div style={cs.statVal}>{r.nb_residents}</div><div style={cs.statLbl}>Résidents</div></div>}
           </div>
+
+          {r.code && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+              <span style={{ fontSize: 13, color: '#94a3b8' }}>Code :</span>
+              <span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: '600', color: '#a5b4fc', background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: 6, padding: '3px 10px', letterSpacing: '0.5px' }}>
+                {r.code}
+              </span>
+              <button
+                onClick={() => handleCopy(r.code, r.id)}
+                style={{ padding: '3px 10px', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 6, background: copiedId === r.id ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.06)', color: copiedId === r.id ? '#4ade80' : '#94a3b8', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s' }}
+              >
+                {copiedId === r.id ? 'Copié !' : 'Copier'}
+              </button>
+            </div>
+          )}
 
           <div style={cs.actRow}>
             <button
