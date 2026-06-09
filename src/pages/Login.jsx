@@ -22,6 +22,8 @@ export default function Login() {
       login(data.user, data.token);
       if (data.user.role === 'gestionnaire') {
         navigate('/dashboard/gestionnaire');
+      } else if (!data.user.residence_id) {
+        navigate('/join-residence');
       } else {
         navigate('/dashboard/resident');
       }

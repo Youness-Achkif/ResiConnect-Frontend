@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { CLOUDINARY_IMAGE_URL, CLOUDINARY_RAW_URL, CLOUDINARY_UPLOAD_PRESET } from '../config/cloudinary';
 import SectionResidences from '../components/SectionResidences';
+import SectionDemandes   from '../components/SectionDemandes';
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
@@ -989,12 +990,13 @@ function SectionMessages({ onRead }) {
 // ─── Dashboard principal ──────────────────────────────────────────────────────
 
 const TABS = [
-  { key: 'residents', label: 'Résidents' },
-  { key: 'paiements', label: 'Paiements' },
-  { key: 'problemes', label: 'Problèmes' },
-  { key: 'annonces',  label: 'Annonces'  },
-  { key: 'messages',  label: 'Messages'  },
-  { key: 'residences', label: '⚙️ Résidences' },
+  { key: 'residents',  label: 'Résidents'       },
+  { key: 'paiements',  label: 'Paiements'        },
+  { key: 'problemes',  label: 'Problèmes'        },
+  { key: 'annonces',   label: 'Annonces'         },
+  { key: 'messages',   label: 'Messages'         },
+  { key: 'demandes',   label: 'Demandes'         },
+  { key: 'residences', label: '⚙️ Résidences'   },
 ];
 
 export default function DashboardGestionnaire() {
@@ -1004,8 +1006,9 @@ export default function DashboardGestionnaire() {
     () => localStorage.getItem('activeSection') || 'residents'
   );
   const [isLoadingResidences, setIsLoadingResidences] = useState(true);
-  const [menuOpen, setMenuOpen]       = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
+  const [menuOpen, setMenuOpen]         = useState(false);
+  const [unreadCount, setUnreadCount]   = useState(0);
+  const [demandesCount, setDemandesCount] = useState(0);
 
   const setActiveSectionPersisted = (section) => {
     setActiveSection(section);
@@ -1034,6 +1037,15 @@ export default function DashboardGestionnaire() {
       .catch(() => {});
     fetchUnread();
     const id = setInterval(fetchUnread, 3000);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    const fetchDemandes = () => api.get('/api/join-requests')
+      .then(({ data }) => setDemandesCount(data.length))
+      .catch(() => {});
+    fetchDemandes();
+    const id = setInterval(fetchDemandes, 30000);
     return () => clearInterval(id);
   }, []);
 
@@ -1110,6 +1122,11 @@ export default function DashboardGestionnaire() {
                   {unreadCount}
                 </span>
               )}
+              {tab.key === 'demandes' && demandesCount > 0 && (
+                <span style={{ background: '#ef4444', color: '#fff', borderRadius: 10, padding: '1px 6px', fontSize: 11, fontWeight: '700', marginLeft: 6 }}>
+                  {demandesCount}
+                </span>
+              )}
             </button>
           ))
         )}
@@ -1130,6 +1147,9 @@ export default function DashboardGestionnaire() {
                 {tab.key === 'messages' && unreadCount > 0 && (
                   <span style={{ background: '#6366f1', color: '#fff', borderRadius: 10, padding: '1px 6px', fontSize: 11, fontWeight: '700', marginLeft: 8 }}>{unreadCount}</span>
                 )}
+                {tab.key === 'demandes' && demandesCount > 0 && (
+                  <span style={{ background: '#ef4444', color: '#fff', borderRadius: 10, padding: '1px 6px', fontSize: 11, fontWeight: '700', marginLeft: 8 }}>{demandesCount}</span>
+                )}
               </button>
             ))}
           </div>
@@ -1142,6 +1162,7 @@ export default function DashboardGestionnaire() {
         {activeSection === 'problemes'  && <SectionProblemes />}
         {activeSection === 'annonces'   && <SectionAnnonces />}
         {activeSection === 'messages'   && <SectionMessages onRead={() => setUnreadCount(0)} />}
+        {activeSection === 'demandes'   && <SectionDemandes refreshResidences={refreshResidences} />}
         {activeSection === 'residences' && <SectionResidences welcomeMode={residences.length === 0} />}
       </div>
     </div>

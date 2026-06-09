@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
 export default function Register() {
+  const [role, setRole]                 = useState('gestionnaire');
   const [form, setForm]                 = useState({ nom: '', email: '', mot_de_passe: '' });
   const [error, setError]               = useState('');
   const [success, setSuccess]           = useState('');
@@ -11,15 +12,27 @@ export default function Register() {
   const [btnHover, setBtnHover]         = useState(false);
   const navigate = useNavigate();
 
+  function switchRole(r) {
+    setRole(r);
+    setError('');
+    setSuccess('');
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
     setLoading(true);
     try {
-      await api.post('/api/auth/register', { ...form, role: 'gestionnaire' });
-      setSuccess('Compte créé ! Vous pouvez vous connecter.');
-      setTimeout(() => navigate('/login'), 2200);
+      if (role === 'gestionnaire') {
+        await api.post('/api/auth/register', { ...form, role: 'gestionnaire' });
+        setSuccess('Compte créé ! Vous pouvez vous connecter.');
+        setTimeout(() => navigate('/login'), 2200);
+      } else {
+        await api.post('/api/auth/register-resident', form);
+        setSuccess('Compte créé ! Recherchez votre résidence.');
+        setTimeout(() => navigate('/join-residence'), 2200);
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Erreur lors de la création du compte.');
     } finally {
@@ -83,8 +96,29 @@ export default function Register() {
             ResiConnect
           </h1>
           <p style={{ margin: '6px 0 0', fontSize: 13, color: 'rgba(148,163,184,0.8)', fontWeight: 400 }}>
-            Créer un compte gestionnaire
+            {role === 'gestionnaire' ? 'Créer un compte gestionnaire' : 'Créer un compte résident'}
           </p>
+        </div>
+
+        {/* Role toggle */}
+        <div style={{ display: 'flex', gap: 0, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: 4, marginBottom: 24 }}>
+          {['gestionnaire', 'resident'].map(r => (
+            <button
+              key={r}
+              type="button"
+              onClick={() => switchRole(r)}
+              style={{
+                flex: 1, padding: '9px 0', borderRadius: 7, border: 'none',
+                fontSize: 13, fontWeight: role === r ? 600 : 500, cursor: 'pointer',
+                fontFamily: 'inherit', transition: 'all 0.2s',
+                background: role === r ? 'linear-gradient(135deg, #6366f1, #8b5cf6)' : 'transparent',
+                color: role === r ? '#fff' : '#64748b',
+                boxShadow: role === r ? '0 2px 10px rgba(99,102,241,0.35)' : 'none',
+              }}
+            >
+              {r === 'gestionnaire' ? 'Gestionnaire' : 'Résident'}
+            </button>
+          ))}
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -184,7 +218,7 @@ export default function Register() {
               transform: btnHover && !loading ? 'translateY(-1px)' : 'none',
             }}
           >
-            {loading ? 'Création...' : 'Créer le compte'}
+            {loading ? 'Création...' : role === 'gestionnaire' ? 'Créer le compte gestionnaire' : 'Créer le compte résident'}
           </button>
         </form>
 
