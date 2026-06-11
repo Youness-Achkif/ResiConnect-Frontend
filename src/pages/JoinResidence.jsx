@@ -78,10 +78,35 @@ export default function JoinResidence() {
       navigate('/login', { replace: true });
       return;
     }
-    api.get('/api/join-requests/mine')
-      .then(({ data }) => setExistingRequest(data))
-      .catch(() => setExistingRequest(null))
-      .finally(() => setCheckingRequest(false));
+    async function init() {
+      try {
+        const { data: me } = await api.get('/api/auth/me');
+        if (me.residence_id != null) {
+          localStorage.setItem('user', JSON.stringify(me));
+          navigate('/dashboard/resident', { replace: true });
+          return;
+        }
+      } catch {
+        // /me failed, continue to check requests
+      }
+      try {
+        const { data } = await api.get('/api/join-requests/mine');
+        if (data && data.statut === 'accepté') {
+          try {
+            const { data: me } = await api.get('/api/auth/me');
+            localStorage.setItem('user', JSON.stringify(me));
+          } catch {}
+          navigate('/dashboard/resident', { replace: true });
+          return;
+        }
+        setExistingRequest(data);
+      } catch {
+        setExistingRequest(null);
+      } finally {
+        setCheckingRequest(false);
+      }
+    }
+    init();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
