@@ -79,10 +79,10 @@ export default function SectionAppartements({ residenceId }) {
   }
 
   async function handleAssign(id, userId) {
-    if (!userId) return;
+    const userIdToSend = userId === '' ? null : parseInt(userId, 10);
     setError('');
     try {
-      await api.put(`/api/appartements/${id}`, { user_id: parseInt(userId, 10) });
+      await api.put(`/api/appartements/${id}`, { user_id: userIdToSend });
       setAssigningId(null);
       load();
     } catch (err) { setError(err.response?.data?.message || 'Erreur assignation.'); }
