@@ -22,10 +22,14 @@ export default function Login() {
       login(data.user, data.token);
       if (data.user.role === 'gestionnaire') {
         navigate('/dashboard/gestionnaire');
-      } else if (!data.user.residence_id) {
-        navigate('/join-residence');
       } else {
-        navigate('/dashboard/resident');
+        try {
+          const { data: me } = await api.get('/api/auth/me');
+          localStorage.setItem('user', JSON.stringify(me));
+          navigate(me.residence_id != null ? '/dashboard/resident' : '/join-residence');
+        } catch {
+          navigate(!data.user.residence_id ? '/join-residence' : '/dashboard/resident');
+        }
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Identifiants invalides');
