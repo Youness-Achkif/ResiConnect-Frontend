@@ -253,7 +253,7 @@ export default function Login() {
         <p style={{ margin: '20px 0 0', textAlign: 'center', fontSize: 13, color: 'rgba(100,116,139,0.9)' }}>
           Pas encore de compte ?{' '}
           <a href="/register" style={{ color: '#a5b4fc', textDecoration: 'none', fontWeight: 500 }}>
-            Créer un compte gestionnaire
+            S'inscrire
           </a>
         </p>
 
