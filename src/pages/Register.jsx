@@ -30,8 +30,20 @@ export default function Register() {
         setTimeout(() => navigate('/login'), 2200);
       } else {
         await api.post('/api/auth/register-resident', form);
-        setSuccess('Compte créé ! Recherchez votre résidence.');
-        setTimeout(() => navigate('/join-residence'), 2200);
+        const loginRes = await fetch(
+          `${process.env.REACT_APP_API_URL}/api/auth/login`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: form.email, mot_de_passe: form.mot_de_passe }),
+          }
+        );
+        const loginData = await loginRes.json();
+        if (loginData.token) {
+          localStorage.setItem('token', loginData.token);
+          localStorage.setItem('user', JSON.stringify(loginData.user));
+        }
+        navigate('/join-residence');
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Erreur lors de la création du compte.');
