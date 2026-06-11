@@ -50,6 +50,5 @@ yarn-error.log*
 
 # environment variables
 .env
-.env.example
 >>>>>>> 2b72b0b48b961df35c287b002bc9682ee65f089b
 .claude/
