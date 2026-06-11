@@ -154,7 +154,7 @@ function SectionResidents() {
       setShowForm(false);
       fetchResidents();
     } catch (err) {
-      setError(err.response?.data?.message || "Erreur lors de l'invitation.");
+      setError(err.response?.data?.error || err.response?.data?.message || "Erreur lors de l'invitation.");
     } finally {
       setSubmitting(false);
     }
