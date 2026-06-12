@@ -68,10 +68,15 @@ export default function SectionVisiteurs() {
     nb_utilisations_max: 1,
   });
 
-  useEffect(() => { fetchVisiteurs(); }, []);
+  useEffect(() => {
+    fetchVisiteurs(true);
+    const interval = setInterval(() => fetchVisiteurs(false), 15000);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  async function fetchVisiteurs() {
-    setLoading(true);
+  async function fetchVisiteurs(isInitial = true) {
+    if (isInitial) setLoading(true);
     setError('');
     try {
       const { data } = await api.get('/api/visiteurs');
@@ -79,7 +84,7 @@ export default function SectionVisiteurs() {
     } catch {
       setError('Impossible de charger vos visiteurs.');
     } finally {
-      setLoading(false);
+      if (isInitial) setLoading(false);
     }
   }
 
@@ -172,7 +177,15 @@ export default function SectionVisiteurs() {
     <>
       <div style={s.card}>
         <div style={s.cardHead}>
-          <h2 style={s.h2}>Mes visiteurs</h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <h2 style={s.h2}>Mes visiteurs</h2>
+            <button
+              style={{ ...s.btn, ...s.btnNeutral, padding: '3px 10px', minHeight: 26, fontSize: 12 }}
+              onClick={() => fetchVisiteurs(true)}
+            >
+              🔄 Actualiser
+            </button>
+          </div>
           <button
             style={{ ...s.btn, ...s.btnPrimary }}
             onClick={() => { setShowForm(v => !v); setError(''); }}
