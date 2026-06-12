@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ScanCamera from '../components/ScanCamera';
 
 export default function ScanLogin() {
@@ -9,6 +9,10 @@ export default function ScanLogin() {
   const [focusedField, setFocusedField] = useState(null);
   const [btnHover, setBtnHover] = useState(false);
   const [session, setSession] = useState(null);
+  const [suggestions, setSuggestions] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const debounceRef = useRef(null);
+  const codeContainerRef = useRef(null);
 
   useEffect(() => {
     const rid = sessionStorage.getItem('scan_residence_id');
@@ -17,6 +21,46 @@ export default function ScanLogin() {
       setSession({ residenceId: parseInt(rid, 10), residenceNom: rnom });
     }
   }, []);
+
+  // Debounced autocomplete search
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (code.length < 2) {
+      setSuggestions([]);
+      setShowDropdown(false);
+      return;
+    }
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const base = process.env.REACT_APP_API_URL || '';
+        const res = await fetch(`${base}/api/residences/search?q=${encodeURIComponent(code)}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        setSuggestions(data);
+        setShowDropdown(data.length > 0);
+      } catch {
+        // silently fail — user can still type code directly
+      }
+    }, 300);
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+  }, [code]);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (codeContainerRef.current && !codeContainerRef.current.contains(e.target)) {
+        setShowDropdown(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  function handleSelectSuggestion(r) {
+    setCode(r.code);
+    setSuggestions([]);
+    setShowDropdown(false);
+  }
 
   async function handleLogin(e) {
     e.preventDefault();
@@ -147,17 +191,57 @@ export default function ScanLogin() {
             }}>
               Code résidence
             </label>
-            <input
-              type="text"
-              value={code}
-              onChange={e => setCode(e.target.value.toUpperCase())}
-              onFocus={() => setFocusedField('code')}
-              onBlur={() => setFocusedField(null)}
-              required
-              placeholder="ex : RC-4829"
-              autoComplete="off"
-              style={inputStyle('code')}
-            />
+            <div ref={codeContainerRef} style={{ position: 'relative' }}>
+              <input
+                type="text"
+                value={code}
+                onChange={e => setCode(e.target.value)}
+                onFocus={() => {
+                  setFocusedField('code');
+                  if (suggestions.length > 0) setShowDropdown(true);
+                }}
+                onBlur={() => setFocusedField(null)}
+                required
+                placeholder="ex : RC-4829 ou Les Pins"
+                autoComplete="off"
+                style={inputStyle('code')}
+              />
+              {showDropdown && suggestions.length > 0 && (
+                <div style={{
+                  position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50,
+                  background: '#1a1d27',
+                  border: '1px solid rgba(99,102,241,0.35)',
+                  borderRadius: 10, marginTop: 4,
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
+                  maxHeight: 220, overflowY: 'auto',
+                }}>
+                  {suggestions.map((r, i) => (
+                    <div
+                      key={r.id}
+                      onMouseDown={e => { e.preventDefault(); handleSelectSuggestion(r); }}
+                      style={{
+                        padding: '10px 14px', cursor: 'pointer',
+                        borderBottom: i < suggestions.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
+                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.12)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+                    >
+                      <span style={{ fontSize: 14, color: '#e2e8f0', fontWeight: 500 }}>{r.nom}</span>
+                      {r.code && (
+                        <span style={{
+                          fontSize: 12, color: '#64748b', fontFamily: 'monospace',
+                          background: 'rgba(255,255,255,0.05)', borderRadius: 5,
+                          padding: '2px 7px', flexShrink: 0, marginLeft: 10,
+                        }}>
+                          {r.code}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* PIN */}
