@@ -8,6 +8,7 @@ import ActivateAccount from './pages/ActivateAccount';
 import DashboardGestionnaire from './pages/DashboardGestionnaire';
 import DashboardResident from './pages/DashboardResident';
 import JoinResidence from './pages/JoinResidence';
+import ScanLogin from './pages/ScanLogin';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/activate/:token" element={<ActivateAccount />} />
           <Route path="/join-residence" element={<JoinResidence />} />
+          <Route path="/scan" element={<ScanLogin />} />
           <Route
             path="/dashboard/gestionnaire"
             element={
