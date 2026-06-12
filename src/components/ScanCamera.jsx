@@ -86,6 +86,7 @@ export default function ScanCamera({ residenceId, residenceNom, onLogout }) {
   const [cameraError, setCameraError] = useState('');
   const html5Ref = useRef(null);
   const handlingRef = useRef(false);
+  const isReadyRef = useRef(false);
 
   useEffect(() => {
     const qr = new Html5Qrcode(READER_ID);
@@ -96,7 +97,9 @@ export default function ScanCamera({ residenceId, residenceNom, onLogout }) {
     async function onScanSuccess(token) {
       if (handlingRef.current) return;
       handlingRef.current = true;
-      qr.pause();
+      if (isReadyRef.current) {
+        try { qr.pause(); } catch (e) { console.warn('Scanner pause failed:', e); }
+      }
       setPhase('verifying');
       try {
         const base = process.env.REACT_APP_API_URL || '';
@@ -116,9 +119,11 @@ export default function ScanCamera({ residenceId, residenceNom, onLogout }) {
     async function start() {
       try {
         await qr.start({ facingMode: 'environment' }, cfg, onScanSuccess, () => {});
+        isReadyRef.current = true;
       } catch {
         try {
           await qr.start({ facingMode: 'user' }, cfg, onScanSuccess, () => {});
+          isReadyRef.current = true;
         } catch (err) {
           const msg = (err?.message || '').toLowerCase();
           if (msg.includes('permission') || msg.includes('notallowed')) {
@@ -133,7 +138,11 @@ export default function ScanCamera({ residenceId, residenceNom, onLogout }) {
     }
 
     start();
-    return () => { qr.stop().catch(() => {}); };
+    return () => {
+      if (isReadyRef.current) {
+        try { qr.stop(); } catch (e) { console.warn('Scanner stop failed:', e); }
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -141,7 +150,9 @@ export default function ScanCamera({ residenceId, residenceNom, onLogout }) {
     handlingRef.current = false;
     setResult(null);
     setPhase('scanning');
-    html5Ref.current?.resume();
+    if (html5Ref.current && isReadyRef.current) {
+      try { html5Ref.current.resume(); } catch (e) { console.warn('Scanner resume failed:', e); }
+    }
   }
 
   return (
