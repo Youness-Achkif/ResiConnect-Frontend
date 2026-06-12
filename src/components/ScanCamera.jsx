@@ -91,47 +91,56 @@ export default function ScanCamera({ residenceId, residenceNom, onLogout }) {
   useEffect(() => {
     let cancelled = false;
 
-    const container = document.getElementById(READER_ID);
-    if (container) container.innerHTML = '';
-
-    const qr = new Html5Qrcode(READER_ID);
-    html5Ref.current = qr;
-    isReadyRef.current = false;
-
-    const cfg = { fps: 10, qrbox: { width: 250, height: 250 } };
-
-    async function onScanSuccess(token) {
-      if (handlingRef.current) return;
-      handlingRef.current = true;
-      if (isReadyRef.current) {
-        try { qr.pause(); } catch (e) { console.warn('Scanner pause failed:', e); }
+    async function init() {
+      if (html5Ref.current) {
+        try {
+          await html5Ref.current.stop();
+          await html5Ref.current.clear();
+        } catch (e) {
+          console.warn('Cleanup previous scanner:', e);
+        }
+        html5Ref.current = null;
       }
-      setPhase('verifying');
-      try {
-        const base = process.env.REACT_APP_API_URL || '';
-        const res = await fetch(`${base}/api/scan/verifier`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token, residence_id: Number(residenceId) }),
-        });
-        const data = await res.json();
-        setResult(data);
-      } catch {
-        setResult({ autorise: false, raison: 'Erreur réseau. Veuillez réessayer.' });
-      }
-      setPhase('result');
-    }
 
-    async function start() {
+      if (cancelled) return;
+
+      const qr = new Html5Qrcode(READER_ID);
+      html5Ref.current = qr;
+      isReadyRef.current = false;
+
+      const cfg = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+      async function onScanSuccess(token) {
+        if (handlingRef.current) return;
+        handlingRef.current = true;
+        if (isReadyRef.current) {
+          try { qr.pause(); } catch (e) { console.warn('Scanner pause failed:', e); }
+        }
+        setPhase('verifying');
+        try {
+          const base = process.env.REACT_APP_API_URL || '';
+          const res = await fetch(`${base}/api/scan/verifier`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token, residence_id: Number(residenceId) }),
+          });
+          const data = await res.json();
+          setResult(data);
+        } catch {
+          setResult({ autorise: false, raison: 'Erreur réseau. Veuillez réessayer.' });
+        }
+        setPhase('result');
+      }
+
       try {
         await qr.start({ facingMode: 'environment' }, cfg, onScanSuccess, () => {});
-        if (cancelled) { try { qr.stop(); } catch (_) {} return; }
+        if (cancelled) { try { await qr.stop(); await qr.clear(); } catch (_) {} return; }
         isReadyRef.current = true;
       } catch {
         try {
           try { await qr.stop(); } catch (_) {}
           await qr.start({ facingMode: 'user' }, cfg, onScanSuccess, () => {});
-          if (cancelled) { try { qr.stop(); } catch (_) {} return; }
+          if (cancelled) { try { await qr.stop(); await qr.clear(); } catch (_) {} return; }
           isReadyRef.current = true;
         } catch (err) {
           if (!cancelled) {
@@ -148,11 +157,21 @@ export default function ScanCamera({ residenceId, residenceNom, onLogout }) {
       }
     }
 
-    start();
+    init();
+
     return () => {
       cancelled = true;
       isReadyRef.current = false;
-      try { qr.stop(); } catch (e) { console.warn('Scanner stop failed:', e); }
+      (async () => {
+        try {
+          if (html5Ref.current) {
+            await html5Ref.current.stop();
+            await html5Ref.current.clear();
+          }
+        } catch (e) {
+          console.warn('Cleanup on unmount:', e);
+        }
+      })();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
