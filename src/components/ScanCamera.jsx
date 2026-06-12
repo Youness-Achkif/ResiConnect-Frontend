@@ -89,17 +89,18 @@ export default function ScanCamera({ residenceId, residenceNom, onLogout }) {
   const isReadyRef = useRef(false);
 
   useEffect(() => {
-    const handler = (event) => {
-      if (
-        event.reason &&
-        typeof event.reason.message === 'string' &&
-        event.reason.message.includes('play() request was interrupted')
-      ) {
-        event.preventDefault();
-      }
+    const originalPlay = HTMLMediaElement.prototype.play;
+    HTMLMediaElement.prototype.play = function (...args) {
+      const promise = originalPlay.apply(this, args);
+      if (!promise) return promise;
+      return promise.catch((err) => {
+        if (err.name === 'AbortError') return;
+        throw err;
+      });
     };
-    window.addEventListener('unhandledrejection', handler);
-    return () => window.removeEventListener('unhandledrejection', handler);
+    return () => {
+      HTMLMediaElement.prototype.play = originalPlay;
+    };
   }, []);
 
   useEffect(() => {
