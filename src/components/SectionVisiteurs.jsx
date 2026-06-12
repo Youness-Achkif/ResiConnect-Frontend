@@ -65,7 +65,7 @@ export default function SectionVisiteurs() {
     nom: '',
     type: 'Famille',
     date_validite: '',
-    nb_utilisations_max: 1,
+    max_utilisations: 1,
   });
 
   useEffect(() => {
@@ -97,9 +97,9 @@ export default function SectionVisiteurs() {
         nom: form.nom,
         type: form.type,
         date_validite: form.date_validite,
-        nb_utilisations_max: parseInt(form.nb_utilisations_max, 10),
+        max_utilisations: parseInt(form.max_utilisations, 10),
       });
-      setForm({ nom: '', type: 'Famille', date_validite: '', nb_utilisations_max: 1 });
+      setForm({ nom: '', type: 'Famille', date_validite: '', max_utilisations: 1 });
       setShowForm(false);
       setActiveQr(data);
       fetchVisiteurs();
@@ -233,9 +233,9 @@ export default function SectionVisiteurs() {
                 <input
                   type="number"
                   style={s.input}
-                  value={form.nb_utilisations_max}
+                  value={form.max_utilisations}
                   min={1}
-                  onChange={e => setForm({ ...form, nb_utilisations_max: e.target.value })}
+                  onChange={e => setForm({ ...form, max_utilisations: e.target.value })}
                   required
                 />
               </div>
@@ -276,7 +276,7 @@ export default function SectionVisiteurs() {
                       <td style={{ ...s.td, whiteSpace: 'nowrap' }}>{formatDateFr(v.date_validite)}</td>
                       <td style={s.td}>
                         <span style={{ color: '#a5b4fc', fontWeight: '600' }}>
-                          {v.nb_utilisations ?? 0}/{v.nb_utilisations_max ?? 1}
+                          {v.nb_utilisations ?? 0}/{v.max_utilisations ?? 1}
                         </span>
                       </td>
                       <td style={s.td}>
