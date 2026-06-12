@@ -87,14 +87,16 @@ export default function ScanCamera({ residenceId, residenceNom, onLogout }) {
   const html5Ref = useRef(null);
   const handlingRef = useRef(false);
   const isReadyRef = useRef(false);
-  const initStartedRef = useRef(false);
 
   useEffect(() => {
-    if (initStartedRef.current) return;
-    initStartedRef.current = true;
+    let cancelled = false;
+
+    const container = document.getElementById(READER_ID);
+    if (container) container.innerHTML = '';
 
     const qr = new Html5Qrcode(READER_ID);
     html5Ref.current = qr;
+    isReadyRef.current = false;
 
     const cfg = { fps: 10, qrbox: { width: 250, height: 250 } };
 
@@ -123,20 +125,24 @@ export default function ScanCamera({ residenceId, residenceNom, onLogout }) {
     async function start() {
       try {
         await qr.start({ facingMode: 'environment' }, cfg, onScanSuccess, () => {});
+        if (cancelled) { try { qr.stop(); } catch (_) {} return; }
         isReadyRef.current = true;
       } catch {
         try {
           try { await qr.stop(); } catch (_) {}
           await qr.start({ facingMode: 'user' }, cfg, onScanSuccess, () => {});
+          if (cancelled) { try { qr.stop(); } catch (_) {} return; }
           isReadyRef.current = true;
         } catch (err) {
-          const msg = (err?.message || '').toLowerCase();
-          if (msg.includes('permission') || msg.includes('notallowed')) {
-            setCameraError("Accès à la caméra refusé. Autorisez l'accès dans les paramètres du navigateur.");
-          } else if (msg.includes('notfound') || msg.includes('no camera')) {
-            setCameraError('Aucune caméra détectée sur cet appareil.');
-          } else {
-            setCameraError("Impossible d'accéder à la caméra. Vérifiez que vous utilisez HTTPS.");
+          if (!cancelled) {
+            const msg = (err?.message || '').toLowerCase();
+            if (msg.includes('permission') || msg.includes('notallowed')) {
+              setCameraError("Accès à la caméra refusé. Autorisez l'accès dans les paramètres du navigateur.");
+            } else if (msg.includes('notfound') || msg.includes('no camera')) {
+              setCameraError('Aucune caméra détectée sur cet appareil.');
+            } else {
+              setCameraError("Impossible d'accéder à la caméra. Vérifiez que vous utilisez HTTPS.");
+            }
           }
         }
       }
@@ -144,10 +150,9 @@ export default function ScanCamera({ residenceId, residenceNom, onLogout }) {
 
     start();
     return () => {
-      initStartedRef.current = false;
-      if (isReadyRef.current) {
-        try { qr.stop(); } catch (e) { console.warn('Scanner stop failed:', e); }
-      }
+      cancelled = true;
+      isReadyRef.current = false;
+      try { qr.stop(); } catch (e) { console.warn('Scanner stop failed:', e); }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
