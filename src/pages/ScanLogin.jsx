@@ -189,7 +189,7 @@ export default function ScanLogin() {
               display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 500,
               color: 'rgba(203,213,225,0.9)', letterSpacing: '0.2px',
             }}>
-              Code résidence
+              Nom ou code résidence
             </label>
             <div ref={codeContainerRef} style={{ position: 'relative' }}>
               <input
