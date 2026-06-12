@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { CLOUDINARY_IMAGE_URL, CLOUDINARY_RAW_URL, CLOUDINARY_UPLOAD_PRESET } from '../config/cloudinary';
-import SectionResidences from '../components/SectionResidences';
-import SectionDemandes   from '../components/SectionDemandes';
+import SectionResidences  from '../components/SectionResidences';
+import SectionDemandes    from '../components/SectionDemandes';
+import SectionHistorique  from '../components/SectionHistorique';
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
@@ -996,6 +997,7 @@ const TABS = [
   { key: 'annonces',   label: 'Annonces'         },
   { key: 'messages',   label: 'Messages'         },
   { key: 'demandes',   label: 'Demandes'         },
+  { key: 'historique', label: 'Historique'       },
   { key: 'residences', label: '⚙️ Résidences'   },
 ];
 
@@ -1163,6 +1165,7 @@ export default function DashboardGestionnaire() {
         {activeSection === 'annonces'   && <SectionAnnonces />}
         {activeSection === 'messages'   && <SectionMessages onRead={() => setUnreadCount(0)} />}
         {activeSection === 'demandes'   && <SectionDemandes refreshResidences={refreshResidences} />}
+        {activeSection === 'historique' && <SectionHistorique />}
         {activeSection === 'residences' && <SectionResidences welcomeMode={residences.length === 0} />}
       </div>
     </div>

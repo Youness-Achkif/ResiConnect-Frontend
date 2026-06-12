@@ -38,9 +38,13 @@ export default function SectionResidences({ welcomeMode }) {
   const [showForm, setShowForm]       = useState(false);
   const [form, setForm]               = useState({ nom: '', adresse: '' });
   const [submitting, setSubmitting]   = useState(false);
-  const [expandedId, setExpandedId]   = useState(null);
+  const [expandedId, setExpandedId]         = useState(null);
   const [expandedSection, setExpandedSection] = useState('batiments');
-  const [copiedId, setCopiedId]       = useState(null);
+  const [copiedId, setCopiedId]             = useState(null);
+  const [pinFormId, setPinFormId]           = useState(null);
+  const [pin, setPin]                       = useState('');
+  const [pinMsg, setPinMsg]                 = useState(null);
+  const [pinSubmitting, setPinSubmitting]   = useState(false);
 
   function handleCopy(code, id) {
     navigator.clipboard.writeText(code).then(() => {
@@ -79,6 +83,39 @@ export default function SectionResidences({ welcomeMode }) {
     if (!window.confirm('Supprimer cette résidence et toutes ses données ?')) return;
     try { await api.delete(`/api/residences/${id}`); load(); refreshResidences(); }
     catch { setError('Erreur suppression.'); }
+  }
+
+  function togglePinForm(id) {
+    if (pinFormId === id) {
+      setPinFormId(null);
+    } else {
+      setPinFormId(id);
+      setPin('');
+      setPinMsg(null);
+    }
+  }
+
+  async function handlePinSubmit(e, residenceId) {
+    e.preventDefault();
+    if (!/^\d{4,6}$/.test(pin)) {
+      setPinMsg({ type: 'error', text: 'Le PIN doit contenir 4 à 6 chiffres numériques.' });
+      return;
+    }
+    setPinSubmitting(true);
+    setPinMsg(null);
+    try {
+      await api.put(`/api/residences/${residenceId}/pin`, { pin });
+      setPinMsg({ type: 'success', text: 'PIN mis à jour.' });
+      setPin('');
+    } catch (err) {
+      const status = err.response?.status;
+      const msg    = err.response?.data?.message || err.response?.data?.error;
+      if (status === 400) setPinMsg({ type: 'error', text: msg || 'PIN invalide (4 à 6 chiffres).' });
+      else if (status === 403) setPinMsg({ type: 'error', text: 'Accès refusé à cette résidence.' });
+      else setPinMsg({ type: 'error', text: msg || 'Erreur lors de la mise à jour.' });
+    } finally {
+      setPinSubmitting(false);
+    }
   }
 
   function toggleExpand(id, section = 'batiments') {
@@ -167,6 +204,12 @@ export default function SectionResidences({ welcomeMode }) {
             >
               {expandedId === r.id && expandedSection === 'appartements' ? '▾' : '▸'} Appartements
             </button>
+            <button
+              style={{ ...cs.expandBtn, ...(pinFormId === r.id ? { color: '#fbbf24', border: '1px solid rgba(245,158,11,0.35)' } : {}) }}
+              onClick={() => togglePinForm(r.id)}
+            >
+              {pinFormId === r.id ? '▾' : '▸'} PIN gardien
+            </button>
             <button style={{ ...cs.btn, ...cs.btnD, minHeight: 30, padding: '5px 12px' }} onClick={() => handleDelete(r.id)}>
               Supprimer
             </button>
@@ -174,6 +217,37 @@ export default function SectionResidences({ welcomeMode }) {
 
           {expandedId === r.id && expandedSection === 'batiments'    && <SectionBatiments    residenceId={r.id} />}
           {expandedId === r.id && expandedSection === 'appartements' && <SectionAppartements residenceId={r.id} />}
+
+          {pinFormId === r.id && (
+            <form
+              onSubmit={e => handlePinSubmit(e, r.id)}
+              style={{ marginTop: 14, padding: '14px 16px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 10 }}
+            >
+              <p style={{ margin: '0 0 10px', fontSize: 13, color: '#94a3b8' }}>
+                Définir le PIN d'accès pour les gardiens (4 à 6 chiffres)
+              </p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                <input
+                  type="password"
+                  inputMode="numeric"
+                  value={pin}
+                  onChange={e => { setPin(e.target.value); setPinMsg(null); }}
+                  placeholder="••••"
+                  maxLength={6}
+                  style={{ ...cs.input, width: 130 }}
+                  required
+                />
+                <button type="submit" style={{ ...cs.btn, ...cs.btnP }} disabled={pinSubmitting}>
+                  {pinSubmitting ? 'Mise à jour...' : 'Enregistrer'}
+                </button>
+              </div>
+              {pinMsg && (
+                <p style={{ margin: '8px 0 0', fontSize: 13, color: pinMsg.type === 'success' ? '#4ade80' : '#fca5a5' }}>
+                  {pinMsg.text}
+                </p>
+              )}
+            </form>
+          )}
         </div>
       ))}
     </div>
