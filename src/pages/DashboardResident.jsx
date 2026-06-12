@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { CLOUDINARY_AUTO_URL, CLOUDINARY_UPLOAD_PRESET } from '../config/cloudinary';
+import SectionVisiteurs from '../components/SectionVisiteurs';
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
@@ -631,6 +632,7 @@ const TABS = [
   { key: 'problemes', label: 'Mes problèmes' },
   { key: 'annonces',  label: 'Annonces'      },
   { key: 'messages',  label: 'Messages'      },
+  { key: 'visiteurs', label: 'Mes visiteurs' },
 ];
 
 export default function DashboardResident() {
@@ -734,6 +736,7 @@ export default function DashboardResident() {
         {activeTab === 'problemes' && <SectionProblemes />}
         {activeTab === 'annonces'  && <SectionAnnonces />}
         {activeTab === 'messages'  && <SectionMessages residenceId={residentInfo?.residence_id} />}
+        {activeTab === 'visiteurs' && <SectionVisiteurs />}
       </div>
     </div>
   );
