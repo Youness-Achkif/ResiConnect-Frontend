@@ -87,8 +87,12 @@ export default function ScanCamera({ residenceId, residenceNom, onLogout }) {
   const html5Ref = useRef(null);
   const handlingRef = useRef(false);
   const isReadyRef = useRef(false);
+  const initStartedRef = useRef(false);
 
   useEffect(() => {
+    if (initStartedRef.current) return;
+    initStartedRef.current = true;
+
     const qr = new Html5Qrcode(READER_ID);
     html5Ref.current = qr;
 
@@ -122,6 +126,7 @@ export default function ScanCamera({ residenceId, residenceNom, onLogout }) {
         isReadyRef.current = true;
       } catch {
         try {
+          try { await qr.stop(); } catch (_) {}
           await qr.start({ facingMode: 'user' }, cfg, onScanSuccess, () => {});
           isReadyRef.current = true;
         } catch (err) {
@@ -139,6 +144,7 @@ export default function ScanCamera({ residenceId, residenceNom, onLogout }) {
 
     start();
     return () => {
+      initStartedRef.current = false;
       if (isReadyRef.current) {
         try { qr.stop(); } catch (e) { console.warn('Scanner stop failed:', e); }
       }
