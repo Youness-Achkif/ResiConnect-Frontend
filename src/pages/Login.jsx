@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -255,6 +255,14 @@ export default function Login() {
           <a href="/register" style={{ color: '#a5b4fc', textDecoration: 'none', fontWeight: 500 }}>
             S'inscrire
           </a>
+        </p>
+
+        {/* Scanner link */}
+        <p style={{ margin: '10px 0 0', textAlign: 'center', fontSize: 12, color: 'rgba(100,116,139,0.6)' }}>
+          Agent de sécurité ?{' '}
+          <Link to="/scan" style={{ color: '#94a3b8', textDecoration: 'none', fontWeight: 500 }}>
+            Accéder au scanner QR
+          </Link>
         </p>
 
         {/* Footer */}
