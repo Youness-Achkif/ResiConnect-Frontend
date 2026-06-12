@@ -89,6 +89,20 @@ export default function ScanCamera({ residenceId, residenceNom, onLogout }) {
   const isReadyRef = useRef(false);
 
   useEffect(() => {
+    const handler = (event) => {
+      if (
+        event.reason &&
+        typeof event.reason.message === 'string' &&
+        event.reason.message.includes('play() request was interrupted')
+      ) {
+        event.preventDefault();
+      }
+    };
+    window.addEventListener('unhandledrejection', handler);
+    return () => window.removeEventListener('unhandledrejection', handler);
+  }, []);
+
+  useEffect(() => {
     let cancelled = false;
 
     async function init() {
