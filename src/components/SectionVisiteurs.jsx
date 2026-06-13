@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 const s = {
   card:         { background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: 24, marginBottom: 20, boxShadow: '0 4px 30px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)' },
@@ -47,19 +48,33 @@ function formatDateFr(dateStr) {
   });
 }
 
+function formatDateForShare(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  const dd  = String(d.getDate()).padStart(2, '0');
+  const mm  = String(d.getMonth() + 1).padStart(2, '0');
+  const hh  = String(d.getHours()).padStart(2, '0');
+  const min = String(d.getMinutes()).padStart(2, '0');
+  return `${dd}/${mm}/${d.getFullYear()} ${hh}:${min}`;
+}
+
 function nowLocalIso() {
   const d = new Date();
   return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
 }
 
 export default function SectionVisiteurs() {
+  const { user }                    = useAuth();
   const [visiteurs, setVisiteurs]   = useState([]);
   const [loading, setLoading]       = useState(false);
   const [error, setError]           = useState('');
   const [showForm, setShowForm]     = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [activeQr, setActiveQr]     = useState(null);
+  const [shareMsg, setShareMsg]     = useState('');
   const qrRef                       = useRef(null);
+
+  useEffect(() => { if (activeQr) setShareMsg(''); }, [activeQr]);
 
   const [form, setForm] = useState({
     nom: '',
@@ -157,21 +172,28 @@ export default function SectionVisiteurs() {
     const canvas = await getQRCanvas();
     if (!canvas) return;
     canvas.toBlob(async (pngBlob) => {
-      const file = new File(
-        [pngBlob],
-        `visiteur-${(activeQr.nom || 'qr').replace(/\s+/g, '_')}.png`,
-        { type: 'image/png' }
-      );
+      const fileName = `visiteur-${(activeQr.nom || 'qr').replace(/\s+/g, '_')}.png`;
+      const file = new File([pngBlob], fileName, { type: 'image/png' });
+      const residenceNom = user?.residence_nom ?? 'la résidence';
+      const text = [
+        `Bonjour ${activeQr.nom},`,
+        '',
+        `Voici votre code d'accès pour ${residenceNom} :`,
+        `- Type de visite : ${activeQr.type}`,
+        `- Valide jusqu'au : ${formatDateForShare(activeQr.date_validite)}`,
+        `- Nombre d'utilisations autorisées : ${activeQr.max_utilisations}`,
+        '',
+        "Présentez ce QR code à l'agent de sécurité à votre arrivée.",
+      ].join('\n');
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
-        try { await navigator.share({ files: [file], title: `QR Code — ${activeQr.nom}` }); }
+        try { await navigator.share({ files: [file], title: `QR Code — ${activeQr.nom}`, text }); }
         catch {}
       } else {
-        handleDownload();
+        await handleDownload();
+        setShareMsg("Le partage direct n'est pas disponible sur cet appareil — le QR code a été téléchargé.");
       }
     }, 'image/png');
   }
-
-  const canShare = typeof navigator !== 'undefined' && !!navigator.share;
 
   return (
     <>
@@ -335,16 +357,19 @@ export default function SectionVisiteurs() {
               <QRCodeSVG value={activeQr.token} size={200} />
             </div>
 
-            <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 12, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 4, flexWrap: 'wrap' }}>
               <button style={{ ...s.btn, ...s.btnNeutral }} onClick={handleDownload}>
                 ↓ Télécharger
               </button>
-              {canShare && (
-                <button style={{ ...s.btn, ...s.btnPrimary, marginRight: 0 }} onClick={handleShare}>
-                  Partager
-                </button>
-              )}
+              <button style={{ ...s.btn, ...s.btnPrimary, marginRight: 0 }} onClick={handleShare}>
+                Partager
+              </button>
             </div>
+            {shareMsg && (
+              <p style={{ margin: '0 0 10px', fontSize: 12, color: '#94a3b8', textAlign: 'center', padding: '0 8px' }}>
+                {shareMsg}
+              </p>
+            )}
 
             <button
               onClick={() => setActiveQr(null)}
