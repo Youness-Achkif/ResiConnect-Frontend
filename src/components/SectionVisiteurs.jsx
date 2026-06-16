@@ -70,11 +70,12 @@ export default function SectionVisiteurs() {
   const [error, setError]           = useState('');
   const [showForm, setShowForm]     = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [activeQr, setActiveQr]     = useState(null);
-  const [shareMsg, setShareMsg]     = useState('');
-  const qrRef                       = useRef(null);
+  const [activeQr, setActiveQr]       = useState(null);
+  const [showShareMenu, setShowShareMenu] = useState(false);
+  const [shareText, setShareText]     = useState('');
+  const qrRef                         = useRef(null);
 
-  useEffect(() => { if (activeQr) setShareMsg(''); }, [activeQr]);
+  useEffect(() => { if (activeQr) { setShowShareMenu(false); setShareText(''); } }, [activeQr]);
 
   const [form, setForm] = useState({
     nom: '',
@@ -190,7 +191,8 @@ export default function SectionVisiteurs() {
         catch {}
       } else {
         await handleDownload();
-        setShareMsg("Le partage direct n'est pas disponible sur cet appareil — le QR code a été téléchargé.");
+        setShareText(text);
+        setShowShareMenu(true);
       }
     }, 'image/png');
   }
@@ -365,10 +367,41 @@ export default function SectionVisiteurs() {
                 Partager
               </button>
             </div>
-            {shareMsg && (
-              <p style={{ margin: '0 0 10px', fontSize: 12, color: '#94a3b8', textAlign: 'center', padding: '0 8px' }}>
-                {shareMsg}
-              </p>
+            {showShareMenu && (
+              <div style={{ margin: '8px 0 10px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '12px 14px' }}>
+                <p style={{ margin: '0 0 10px', fontSize: 12, color: '#64748b', textAlign: 'center', lineHeight: 1.5 }}>
+                  L'image du QR code a été téléchargée — joignez-la au message après ouverture.
+                </p>
+                <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank')}
+                    style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 13px', borderRadius: 8, border: '1px solid rgba(37,211,102,0.3)', background: 'rgba(37,211,102,0.1)', color: '#4ade80', fontSize: 13, fontWeight: '500', cursor: 'pointer', fontFamily: 'inherit' }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                    </svg>
+                    WhatsApp
+                  </button>
+                  <button
+                    onClick={() => window.open(`https://t.me/share/url?url=&text=${encodeURIComponent(shareText)}`, '_blank')}
+                    style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 13px', borderRadius: 8, border: '1px solid rgba(0,136,204,0.35)', background: 'rgba(0,136,204,0.1)', color: '#60a5fa', fontSize: 13, fontWeight: '500', cursor: 'pointer', fontFamily: 'inherit' }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                    </svg>
+                    Telegram
+                  </button>
+                  <button
+                    onClick={() => window.open(`mailto:?subject=${encodeURIComponent(`Code d'accès - ${user?.residence_nom ?? 'résidence'}`)}&body=${encodeURIComponent(shareText)}`)}
+                    style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 13px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.07)', color: '#94a3b8', fontSize: 13, fontWeight: '500', cursor: 'pointer', fontFamily: 'inherit' }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+                    </svg>
+                    Email
+                  </button>
+                </div>
+              </div>
             )}
 
             <button
