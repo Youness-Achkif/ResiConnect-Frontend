@@ -9,12 +9,14 @@ import DashboardGestionnaire from './pages/DashboardGestionnaire';
 import DashboardResident from './pages/DashboardResident';
 import JoinResidence from './pages/JoinResidence';
 import ScanLogin from './pages/ScanLogin';
+import LandingPage from './pages/LandingPage';
 
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/activate/:token" element={<ActivateAccount />} />
