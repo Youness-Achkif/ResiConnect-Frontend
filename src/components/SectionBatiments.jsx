@@ -3,17 +3,17 @@ import api from '../services/api';
 
 const cs = {
   head:      { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
-  label:     { fontSize: 14, fontWeight: '600', color: '#cbd5e1' },
-  formPanel: { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, padding: 14, marginBottom: 12 },
+  label:     { fontSize: 14, fontWeight: '700', color: '#0f172a', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" },
+  formPanel: { background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 10, padding: 14, marginBottom: 12 },
   formRow:   { marginBottom: 10 },
-  lbl:       { display: 'block', marginBottom: 5, fontSize: 12, fontWeight: '500', color: '#94a3b8' },
-  input:     { padding: '9px 12px', border: '1.5px solid rgba(255,255,255,0.1)', borderRadius: 8, fontSize: 13, width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.04)', color: '#e2e8f0', fontFamily: 'inherit', outline: 'none' },
-  btn:       { padding: '6px 12px', minHeight: 30, cursor: 'pointer', borderRadius: 7, border: 'none', fontSize: 12, fontWeight: '500', fontFamily: 'inherit', marginRight: 4 },
-  btnP:      { background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: '#fff' },
-  btnD:      { background: 'rgba(239,68,68,0.12)', color: '#fca5a5', border: '1px solid rgba(239,68,68,0.22)' },
-  item:      { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', borderRadius: 7, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', marginBottom: 6 },
-  error:     { color: '#fca5a5', fontSize: 12, margin: '6px 0' },
-  empty:     { color: '#475569', fontSize: 12, textAlign: 'center', padding: '8px 0' },
+  lbl:       { display: 'block', marginBottom: 5, fontSize: 12.5, fontWeight: '600', color: '#475569' },
+  input:     { padding: '9px 12px', border: '1.5px solid #cbd5e1', borderRadius: 8, fontSize: 13, width: '100%', boxSizing: 'border-box', background: '#fff', color: '#0f172a', fontFamily: 'inherit', outline: 'none' },
+  btn:       { padding: '6px 12px', minHeight: 30, cursor: 'pointer', borderRadius: 8, border: 'none', fontSize: 12, fontWeight: '600', fontFamily: 'inherit', marginRight: 4 },
+  btnP:      { background: 'linear-gradient(135deg, #14b890, #0c9576)', color: '#fff', boxShadow: '0 4px 14px rgba(20,184,144,0.28)' },
+  btnD:      { background: '#fee2e2', color: '#b91c1c', border: '1px solid #fecaca' },
+  item:      { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '9px 12px', borderRadius: 8, background: '#f8fafc', border: '1px solid #e2e8f0', marginBottom: 6 },
+  error:     { color: '#b91c1c', fontSize: 12, margin: '6px 0' },
+  empty:     { color: '#64748b', fontSize: 12, textAlign: 'center', padding: '8px 0' },
 };
 
 export default function SectionBatiments({ residenceId }) {
@@ -55,7 +55,7 @@ export default function SectionBatiments({ residenceId }) {
   }
 
   return (
-    <div style={{ marginTop: 18, paddingTop: 18, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+    <div style={{ marginTop: 18, paddingTop: 18, borderTop: '1px solid #e2e8f0' }}>
       <div style={cs.head}>
         <span style={cs.label}>Bâtiments</span>
         <button style={{ ...cs.btn, ...cs.btnP }} onClick={() => setShowForm(v => !v)}>
@@ -79,7 +79,7 @@ export default function SectionBatiments({ residenceId }) {
 
       {batiments.map(b => (
         <div key={b.id} style={cs.item}>
-          <span style={{ color: '#e2e8f0', fontSize: 13, fontWeight: '500' }}>{b.nom}</span>
+          <span style={{ color: '#0f172a', fontSize: 13, fontWeight: '600' }}>{b.nom}</span>
           <button style={{ ...cs.btn, ...cs.btnD }} onClick={() => handleDelete(b.id)}>Supprimer</button>
         </div>
       ))}
