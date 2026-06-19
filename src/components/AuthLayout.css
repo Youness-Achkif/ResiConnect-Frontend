@@ -1,0 +1,157 @@
+/* ============================================================
+   AuthLayout — gabarit des pages d'authentification
+   ============================================================ */
+.rc-auth {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  background: var(--rc-bg);
+  font-family: var(--rc-font-body);
+}
+
+/* ---------- Panneau de marque (gauche, desktop) ---------- */
+.rc-auth__brand {
+  position: relative;
+  flex: 0 0 44%;
+  max-width: 580px;
+  padding: 48px 48px;
+  color: #fff;
+  background: linear-gradient(158deg, #0c7860 0%, #0b4d40 55%, #0d5f4e 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+.rc-auth__brand::before {
+  content: '';
+  position: absolute;
+  top: -130px; right: -120px;
+  width: 360px; height: 360px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.16), transparent 70%);
+  pointer-events: none;
+}
+.rc-auth__brand::after {
+  content: '';
+  position: absolute;
+  bottom: -150px; left: -110px;
+  width: 400px; height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(51, 204, 166, 0.35), transparent 70%);
+  pointer-events: none;
+}
+.rc-auth__brand > * { position: relative; z-index: 1; }
+
+.rc-auth__tagline {
+  font-family: var(--rc-font-heading);
+  font-weight: 800;
+  font-size: 32px;
+  line-height: 1.18;
+  letter-spacing: -0.025em;
+  margin: 0 0 28px;
+  max-width: 400px;
+}
+.rc-auth__points {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.rc-auth__point {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.92);
+}
+.rc-auth__point-ic {
+  flex-shrink: 0;
+  width: 28px; height: 28px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.16);
+  display: flex; align-items: center; justify-content: center;
+}
+.rc-auth__copy {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ---------- Marque (réutilisée brand + mobile) ---------- */
+.rc-brandmark { display: inline-flex; align-items: center; gap: 12px; }
+.rc-brandmark__icon {
+  width: 44px; height: 44px;
+  border-radius: 13px;
+  display: flex; align-items: center; justify-content: center;
+}
+.rc-brandmark--light .rc-brandmark__icon { background: rgba(255, 255, 255, 0.16); }
+.rc-brandmark--dark .rc-brandmark__icon {
+  background: linear-gradient(135deg, var(--rc-primary-500), var(--rc-primary-600));
+  box-shadow: var(--rc-shadow-primary);
+}
+.rc-brandmark__name {
+  font-family: var(--rc-font-heading);
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+}
+.rc-brandmark--light .rc-brandmark__name { color: #fff; }
+.rc-brandmark--dark .rc-brandmark__name { color: var(--rc-text); }
+
+/* ---------- Zone formulaire (droite) ---------- */
+.rc-auth__main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+}
+.rc-auth__inner { width: 100%; max-width: 440px; }
+.rc-auth__mobilelogo { display: none; justify-content: center; margin-bottom: 24px; }
+
+.rc-auth__card {
+  width: 100%;
+  background: var(--rc-surface);
+  border: 1px solid var(--rc-border);
+  border-radius: var(--rc-radius-xl);
+  box-shadow: var(--rc-shadow-lg);
+  padding: 36px 34px;
+  box-sizing: border-box;
+  animation: rc-slide-up 0.3s ease;
+}
+.rc-auth__head { text-align: center; margin-bottom: 26px; }
+.rc-auth__title {
+  margin: 0;
+  font-size: 23px;
+  font-weight: 800;
+  color: var(--rc-text);
+  letter-spacing: -0.02em;
+}
+.rc-auth__sub { margin: 7px 0 0; font-size: 14px; color: var(--rc-text-subtle); }
+
+.rc-auth__alt {
+  margin: 22px 0 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--rc-text-muted);
+}
+.rc-auth__alt a { color: var(--rc-primary-600); font-weight: 600; }
+.rc-auth__alt--sub { margin-top: 10px; font-size: 13px; color: var(--rc-text-subtle); }
+.rc-auth__alt--sub a { color: var(--rc-text-muted); }
+.rc-auth__foot {
+  margin: 18px 0 0;
+  text-align: center;
+  font-size: 12px;
+  color: var(--rc-text-subtle);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .rc-auth__brand { display: none; }
+  .rc-auth__mobilelogo { display: flex; }
+}
+@media (max-width: 480px) {
+  .rc-auth__card { padding: 28px 22px; border-radius: var(--rc-radius-lg); }
+  .rc-auth__main { padding: 24px 16px; }
+}
