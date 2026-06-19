@@ -18,60 +18,75 @@ function useIsMobile() {
 // ─── Styles ──────────────────────────────────────────────────────────────────
 
 const s = {
-  page:            { fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif", minHeight: '100vh', background: 'linear-gradient(160deg, #0f1117 0%, #1a1d27 100%)' },
-  nav:             { background: 'rgba(15,17,23,0.96)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', color: '#fff', display: 'flex', alignItems: 'center', padding: '0 20px', gap: 6, height: 60, position: 'sticky', top: 0, borderBottom: '1px solid rgba(255,255,255,0.07)', boxShadow: '0 2px 20px rgba(0,0,0,0.4)', zIndex: 100 },
+  page:            { fontFamily: "'Inter', system-ui, -apple-system, sans-serif", minHeight: '100vh', background: 'linear-gradient(180deg, #f5f7fa 0%, #eef2f7 100%)' },
+  nav:             { background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', color: '#0f172a', display: 'flex', alignItems: 'center', padding: '0 20px', gap: 6, height: 62, position: 'sticky', top: 0, borderBottom: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(15,23,42,0.06)', zIndex: 100 },
   navLogo:         { display: 'flex', alignItems: 'center', gap: 10, marginRight: 16 },
-  navIcon:         { width: 34, height: 34, borderRadius: 9, background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 2px 10px rgba(99,102,241,0.4)' },
-  navTitle:        { fontWeight: '700', fontSize: 16, color: '#f1f5f9', letterSpacing: '-0.3px' },
+  navIcon:         { width: 34, height: 34, borderRadius: 9, background: 'linear-gradient(135deg, #14b890, #0c9576)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 2px 10px rgba(20,184,144,0.4)' },
+  navTitle:        { fontWeight: '800', fontSize: 17, color: '#0f172a', letterSpacing: '-0.02em', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" },
   navSep:          { flex: 1 },
-  tab:             { background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', color: '#94a3b8', padding: '6px 14px', cursor: 'pointer', borderRadius: 8, fontSize: 13, fontWeight: '500', fontFamily: 'inherit' },
-  tabActive:       { background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', border: '1px solid transparent', color: '#fff', padding: '6px 14px', cursor: 'pointer', borderRadius: 8, fontSize: 13, fontWeight: '600', fontFamily: 'inherit', boxShadow: '0 2px 14px rgba(99,102,241,0.4)' },
-  logoutBtn:       { background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.25)', color: '#fca5a5', padding: '6px 14px', minHeight: 36, cursor: 'pointer', borderRadius: 8, fontSize: 13, fontWeight: '500', fontFamily: 'inherit' },
-  hamburger:       { background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', color: '#94a3b8', padding: '6px 10px', cursor: 'pointer', borderRadius: 8, fontSize: 18, lineHeight: '1.2' },
-  mobileMenu:      { position: 'absolute', top: 60, left: 0, right: 0, background: 'rgba(15,17,23,0.98)', backdropFilter: 'blur(20px)', zIndex: 200, borderTop: '1px solid rgba(255,255,255,0.07)', boxShadow: '0 8px 30px rgba(0,0,0,0.5)' },
-  mobileTab:       { display: 'block', width: '100%', textAlign: 'left', background: 'transparent', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.05)', color: '#94a3b8', padding: '15px 20px', fontSize: 15, cursor: 'pointer', fontFamily: 'inherit', boxSizing: 'border-box' },
-  mobileTabActive: { display: 'block', width: '100%', textAlign: 'left', background: 'rgba(99,102,241,0.12)', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.05)', color: '#a5b4fc', fontWeight: '600', padding: '15px 20px', fontSize: 15, cursor: 'pointer', fontFamily: 'inherit', boxSizing: 'border-box' },
+  tab:             { background: 'transparent', border: '1px solid #e2e8f0', color: '#475569', padding: '6px 14px', cursor: 'pointer', borderRadius: 8, fontSize: 13, fontWeight: '600', fontFamily: 'inherit' },
+  tabActive:       { background: 'linear-gradient(135deg, #14b890, #0c9576)', border: '1px solid transparent', color: '#fff', padding: '6px 14px', cursor: 'pointer', borderRadius: 8, fontSize: 13, fontWeight: '700', fontFamily: 'inherit', boxShadow: '0 2px 12px rgba(20,184,144,0.35)' },
+  logoutBtn:       { background: '#fee2e2', border: '1px solid #fecaca', color: '#b91c1c', padding: '6px 14px', minHeight: 36, cursor: 'pointer', borderRadius: 8, fontSize: 13, fontWeight: '600', fontFamily: 'inherit' },
+  hamburger:       { background: 'transparent', border: '1px solid #cbd5e1', color: '#475569', padding: '6px 10px', cursor: 'pointer', borderRadius: 8, fontSize: 18, lineHeight: '1.2' },
+  mobileMenu:      { position: 'absolute', top: 62, left: 0, right: 0, background: '#fff', zIndex: 200, borderTop: '1px solid #e2e8f0', boxShadow: '0 12px 28px rgba(15,23,42,0.15)' },
+  mobileTab:       { display: 'block', width: '100%', textAlign: 'left', background: 'transparent', border: 'none', borderBottom: '1px solid #eef2f7', color: '#475569', padding: '15px 20px', fontSize: 15, cursor: 'pointer', fontFamily: 'inherit', boxSizing: 'border-box' },
+  mobileTabActive: { display: 'block', width: '100%', textAlign: 'left', background: '#ecfdf7', border: 'none', borderBottom: '1px solid #eef2f7', color: '#0c7860', fontWeight: '700', padding: '15px 20px', fontSize: 15, cursor: 'pointer', fontFamily: 'inherit', boxSizing: 'border-box' },
   section:         { padding: '28px 16px', maxWidth: 960, margin: '0 auto' },
-  card:            { background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: 24, marginBottom: 20, boxShadow: '0 4px 30px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)' },
+  card:            { background: '#fff', border: '1px solid #e2e8f0', borderRadius: 16, padding: 24, marginBottom: 20, boxShadow: '0 1px 3px rgba(15,23,42,0.08), 0 1px 2px rgba(15,23,42,0.04)' },
   cardHead:        { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 10 },
-  h2:              { margin: 0, fontSize: 17, fontWeight: '600', color: '#f1f5f9', letterSpacing: '-0.2px' },
+  h2:              { margin: 0, fontSize: 18, fontWeight: '700', color: '#0f172a', letterSpacing: '-0.02em', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" },
   tableWrapper:    { overflowX: 'auto' },
   table:           { width: '100%', borderCollapse: 'collapse', fontSize: 14, minWidth: 420 },
-  th:              { textAlign: 'left', padding: '10px 14px', borderBottom: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.02)', fontWeight: '600', whiteSpace: 'nowrap', color: '#475569', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.6px' },
-  td:              { padding: '12px 14px', borderBottom: '1px solid rgba(255,255,255,0.05)', verticalAlign: 'middle', color: '#cbd5e1' },
-  btn:             { padding: '8px 14px', minHeight: 36, cursor: 'pointer', borderRadius: 8, border: 'none', fontSize: 13, fontWeight: '500', fontFamily: 'inherit', marginRight: 4 },
-  btnPrimary:      { background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: '#fff', boxShadow: '0 2px 12px rgba(99,102,241,0.3)' },
-  btnDanger:       { background: 'rgba(239,68,68,0.12)', color: '#fca5a5', border: '1px solid rgba(239,68,68,0.22)' },
-  btnNeutral:      { background: 'rgba(255,255,255,0.07)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.1)' },
-  btnSm:           { padding: '4px 10px', cursor: 'pointer', borderRadius: 6, border: 'none', fontSize: 12, fontFamily: 'inherit', fontWeight: '500' },
-  formPanel:       { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: 20, marginBottom: 20 },
+  th:              { textAlign: 'left', padding: '11px 14px', borderBottom: '1px solid #e2e8f0', background: '#f8fafc', fontWeight: '700', whiteSpace: 'nowrap', color: '#64748b', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em' },
+  td:              { padding: '12px 14px', borderBottom: '1px solid #eef2f7', verticalAlign: 'middle', color: '#475569' },
+  btn:             { padding: '8px 14px', minHeight: 36, cursor: 'pointer', borderRadius: 8, border: 'none', fontSize: 13, fontWeight: '600', fontFamily: 'inherit', marginRight: 4 },
+  btnPrimary:      { background: 'linear-gradient(135deg, #14b890, #0c9576)', color: '#fff', boxShadow: '0 4px 14px rgba(20,184,144,0.28)' },
+  btnDanger:       { background: '#fee2e2', color: '#b91c1c', border: '1px solid #fecaca' },
+  btnNeutral:      { background: '#f1f5f9', color: '#475569', border: '1px solid #e2e8f0' },
+  btnSm:           { padding: '4px 10px', cursor: 'pointer', borderRadius: 6, border: 'none', fontSize: 12, fontFamily: 'inherit', fontWeight: '600' },
+  formPanel:       { background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: 20, marginBottom: 20 },
   formRow:         { marginBottom: 14 },
-  label:           { display: 'block', marginBottom: 6, fontSize: 13, fontWeight: '500', color: '#94a3b8' },
-  input:           { padding: '10px 14px', border: '1.5px solid rgba(255,255,255,0.1)', borderRadius: 8, fontSize: 14, width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.04)', color: '#e2e8f0', fontFamily: 'inherit', outline: 'none' },
-  select:          { padding: '9px 12px', border: '1.5px solid rgba(255,255,255,0.1)', borderRadius: 8, fontSize: 13, background: '#1a1d27', color: '#e2e8f0', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' },
-  error:           { color: '#fca5a5', fontSize: 13, margin: '8px 0' },
-  loading:         { color: '#475569', fontSize: 13, margin: '8px 0' },
-  empty:           { color: '#475569', fontSize: 14, padding: '20px 0', textAlign: 'center' },
+  label:           { display: 'block', marginBottom: 6, fontSize: 13, fontWeight: '600', color: '#475569' },
+  input:           { padding: '10px 14px', border: '1.5px solid #cbd5e1', borderRadius: 8, fontSize: 14, width: '100%', boxSizing: 'border-box', background: '#fff', color: '#0f172a', fontFamily: 'inherit', outline: 'none' },
+  select:          { padding: '9px 12px', border: '1.5px solid #cbd5e1', borderRadius: 8, fontSize: 13, background: '#fff', color: '#0f172a', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' },
+  error:           { color: '#b91c1c', fontSize: 13, margin: '8px 0' },
+  loading:         { color: '#64748b', fontSize: 13, margin: '8px 0' },
+  empty:           { color: '#64748b', fontSize: 14, padding: '20px 0', textAlign: 'center' },
   badge:           { padding: '3px 10px', borderRadius: 20, fontSize: 12, fontWeight: '600', display: 'inline-block' },
 };
 
 const BADGE_COLORS = {
-  payé:           { background: 'rgba(34,197,94,0.15)',   color: '#4ade80',  border: '1px solid rgba(34,197,94,0.3)' },
-  'en attente':   { background: 'rgba(245,158,11,0.15)',  color: '#fbbf24',  border: '1px solid rgba(245,158,11,0.3)' },
-  refusé:         { background: 'rgba(239,68,68,0.15)',   color: '#f87171',  border: '1px solid rgba(239,68,68,0.3)' },
-  ouvert:         { background: 'rgba(99,102,241,0.15)',  color: '#a5b4fc',  border: '1px solid rgba(99,102,241,0.3)' },
-  'en cours':     { background: 'rgba(245,158,11,0.15)',  color: '#fbbf24',  border: '1px solid rgba(245,158,11,0.3)' },
-  résolu:         { background: 'rgba(34,197,94,0.15)',   color: '#4ade80',  border: '1px solid rgba(34,197,94,0.3)' },
-  basse:          { background: 'rgba(100,116,139,0.15)', color: '#94a3b8',  border: '1px solid rgba(100,116,139,0.25)' },
-  normale:        { background: 'rgba(99,102,241,0.15)',  color: '#a5b4fc',  border: '1px solid rgba(99,102,241,0.3)' },
-  haute:          { background: 'rgba(239,68,68,0.15)',   color: '#f87171',  border: '1px solid rgba(239,68,68,0.3)' },
-  urgente:        { background: 'rgba(239,68,68,0.25)',   color: '#fca5a5',  border: '1px solid rgba(239,68,68,0.45)' },
+  payé:           { background: '#dcfce7', color: '#15803d', border: '1px solid #bbf7d0' },
+  'en attente':   { background: '#fef3c7', color: '#b45309', border: '1px solid #fde68a' },
+  refusé:         { background: '#fee2e2', color: '#b91c1c', border: '1px solid #fecaca' },
+  ouvert:         { background: '#dbeafe', color: '#1d4ed8', border: '1px solid #bfdbfe' },
+  'en cours':     { background: '#fef3c7', color: '#b45309', border: '1px solid #fde68a' },
+  résolu:         { background: '#dcfce7', color: '#15803d', border: '1px solid #bbf7d0' },
+  basse:          { background: '#f1f5f9', color: '#475569', border: '1px solid #e2e8f0' },
+  normale:        { background: '#dbeafe', color: '#1d4ed8', border: '1px solid #bfdbfe' },
+  haute:          { background: '#fee2e2', color: '#b91c1c', border: '1px solid #fecaca' },
+  urgente:        { background: '#fecaca', color: '#991b1b', border: '1px solid #f87171' },
 };
 
 function Badge({ value }) {
-  const colors = BADGE_COLORS[value] || { background: 'rgba(100,116,139,0.15)', color: '#94a3b8', border: '1px solid rgba(100,116,139,0.2)' };
+  const colors = BADGE_COLORS[value] || { background: '#f1f5f9', color: '#475569', border: '1px solid #e2e8f0' };
   return <span style={{ ...s.badge, ...colors }}>{value ?? '—'}</span>;
 }
+
+// ─── Icônes (SVG, pas d'emoji) ───────────────────────────────────────────────
+const MenuIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <line x1="4" y1="7" x2="20" y2="7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    <line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    <line x1="4" y1="17" x2="20" y2="17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+  </svg>
+);
+const CloseIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+  </svg>
+);
 
 // ─── Section Mes Paiements ────────────────────────────────────────────────────
 
@@ -113,15 +128,15 @@ function SectionPaiements() {
             <tbody>
               {paiements.map(p => (
                 <tr key={p.id}>
-                  <td style={s.td}><span style={{ color: '#a5b4fc', fontWeight: '600' }}>{p.montant} €</span></td>
+                  <td style={s.td}><span style={{ color: '#0c7860', fontWeight: '700' }}>{p.montant} €</span></td>
                   <td style={s.td}>
                     {p.date_paiement ? new Date(p.date_paiement).toLocaleDateString('fr-FR') : '—'}
                   </td>
                   <td style={s.td}><Badge value={p.statut} /></td>
                   <td style={s.td}>
                     {p.justificatif_url
-                      ? <a href={p.justificatif_url} target="_blank" rel="noreferrer" style={{ color: '#a5b4fc', fontSize: 13, textDecoration: 'none' }}>Voir justificatif</a>
-                      : <span style={{ color: '#334155', fontSize: 13 }}>—</span>}
+                      ? <a href={p.justificatif_url} target="_blank" rel="noreferrer" style={{ color: '#0c9576', fontSize: 13, fontWeight: '600', textDecoration: 'none' }}>Voir justificatif</a>
+                      : <span style={{ color: '#94a3b8', fontSize: 13 }}>—</span>}
                   </td>
                 </tr>
               ))}
@@ -350,7 +365,7 @@ function SectionProblemes() {
             <tbody>
               {problemes.map(p => editId === p.id ? (
                 <tr key={p.id}>
-                  <td colSpan={6} style={{ ...s.td, borderBottom: '1px solid rgba(99,102,241,0.2)', background: 'rgba(99,102,241,0.05)' }}>
+                  <td colSpan={6} style={{ ...s.td, borderBottom: '1px solid #a6f2da', background: '#ecfdf7' }}>
                     <form onSubmit={e => handleEditSubmit(e, p.id)} style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-end' }}>
                       <div>
                         <label style={{ ...s.label, marginBottom: 4 }}>Titre</label>
@@ -377,16 +392,16 @@ function SectionProblemes() {
                 </tr>
               ) : (
                 <tr key={p.id}>
-                  <td style={{ ...s.td, color: '#f1f5f9', fontWeight: '500' }}>{p.titre}</td>
+                  <td style={{ ...s.td, color: '#0f172a', fontWeight: '600' }}>{p.titre}</td>
                   <td style={{ ...s.td, maxWidth: 220, color: '#64748b' }}>{p.description ?? '—'}</td>
                   <td style={s.td}><Badge value={p.statut} /></td>
                   <td style={s.td}><Badge value={p.priorite} /></td>
                   <td style={s.td}>
                     {p.photo_url && (
-                      <a href={p.photo_url} target="_blank" rel="noreferrer" style={{ color: '#a5b4fc', fontSize: 13, marginRight: 8, textDecoration: 'none' }}>Voir photo</a>
+                      <a href={p.photo_url} target="_blank" rel="noreferrer" style={{ color: '#0c9576', fontSize: 13, fontWeight: '600', marginRight: 8, textDecoration: 'none' }}>Voir photo</a>
                     )}
                     <button
-                      style={{ ...s.btnSm, background: 'rgba(99,102,241,0.15)', color: '#a5b4fc', border: '1px solid rgba(99,102,241,0.25)' }}
+                      style={{ ...s.btnSm, background: '#ecfdf7', color: '#0c7860', border: '1px solid #a6f2da' }}
                       onClick={() => triggerPhotoChange(p.id)}
                       disabled={uploadingRow === p.id}
                     >
@@ -438,21 +453,21 @@ function SectionAnnonces() {
 
       {annonces.map((a, i) => (
         <div key={a.id} style={{
-          borderBottom: i < annonces.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none',
+          borderBottom: i < annonces.length - 1 ? '1px solid #eef2f7' : 'none',
           paddingBottom: 18,
           marginBottom: 18,
         }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 9, background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 9, background: '#ecfdf7', border: '1px solid #a6f2da', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="#a5b4fc" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M13.73 21a2 2 0 01-3.46 0" stroke="#a5b4fc" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="#0c9576" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M13.73 21a2 2 0 01-3.46 0" stroke="#0c9576" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontWeight: '600', marginBottom: 6, color: '#f1f5f9', fontSize: 15 }}>{a.titre}</div>
-              <div style={{ fontSize: 14, color: '#94a3b8', whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>{a.contenu}</div>
-              <div style={{ fontSize: 12, color: '#334155', marginTop: 8 }}>
+              <div style={{ fontWeight: '700', marginBottom: 6, color: '#0f172a', fontSize: 15 }}>{a.titre}</div>
+              <div style={{ fontSize: 14, color: '#475569', whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>{a.contenu}</div>
+              <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 8 }}>
                 {a.date ?? a.created_at ?? ''}
               </div>
             </div>
@@ -552,8 +567,8 @@ function SectionMessages({ residenceId }) {
 
   const isMe = (msg) => msg.expediteur_id === user?.id || msg.role === 'resident';
 
-  const bubbleMine  = { background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: '#fff', borderRadius: '14px 14px 2px 14px' };
-  const bubbleOther = { background: 'rgba(255,255,255,0.07)', color: '#cbd5e1', borderRadius: '14px 14px 14px 2px', border: '1px solid rgba(255,255,255,0.08)' };
+  const bubbleMine  = { background: 'linear-gradient(135deg, #14b890, #0c9576)', color: '#fff', borderRadius: '14px 14px 2px 14px' };
+  const bubbleOther = { background: '#f1f5f9', color: '#0f172a', borderRadius: '14px 14px 14px 2px', border: '1px solid #e2e8f0' };
 
   return (
     <div style={s.card}>
@@ -566,11 +581,11 @@ function SectionMessages({ residenceId }) {
         style={{
           height: 360,
           overflowY: 'auto',
-          border: '1px solid rgba(255,255,255,0.07)',
+          border: '1px solid #e2e8f0',
           borderRadius: 12,
           padding: 14,
           marginBottom: 12,
-          background: 'rgba(0,0,0,0.2)',
+          background: '#f8fafc',
         }}
       >
         {messages.length === 0 && !loading && (
@@ -582,7 +597,7 @@ function SectionMessages({ residenceId }) {
             <div key={m.id} style={{ display: 'flex', justifyContent: mine ? 'flex-end' : 'flex-start', marginBottom: 10 }}>
               <div style={{ maxWidth: '72%', ...(mine ? bubbleMine : bubbleOther), padding: '9px 13px', fontSize: 14 }}>
                 {!mine && (
-                  <div style={{ fontSize: 11, fontWeight: '600', marginBottom: 3, color: '#a5b4fc' }}>
+                  <div style={{ fontSize: 11, fontWeight: '700', marginBottom: 3, color: '#0c7860' }}>
                     {m.expediteur_nom ?? 'Gestionnaire'}
                   </div>
                 )}
@@ -603,7 +618,7 @@ function SectionMessages({ residenceId }) {
         <div style={{ textAlign: 'center', padding: '4px 0' }}>
           <button
             onClick={scrollToBottom}
-            style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: '#fff', border: 'none', borderRadius: 20, padding: '6px 18px', fontSize: 13, cursor: 'pointer', boxShadow: '0 2px 12px rgba(99,102,241,0.4)', fontFamily: 'inherit' }}
+            style={{ background: 'linear-gradient(135deg, #14b890, #0c9576)', color: '#fff', border: 'none', borderRadius: 20, padding: '6px 18px', fontSize: 13, cursor: 'pointer', boxShadow: '0 4px 14px rgba(20,184,144,0.35)', fontFamily: 'inherit' }}
           >
             Nouveau message ↓
           </button>
@@ -658,13 +673,13 @@ export default function DashboardResident() {
   return (
     <div style={s.page}>
       <style>{`
-        input::placeholder, textarea::placeholder { color: rgba(100,116,139,0.6); }
-        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.6); }
-        select option { background: #1a1d27; color: #e2e8f0; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
-        ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.3); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,0.5); }
+        input::placeholder, textarea::placeholder { color: #94a3b8; }
+        select option { background: #fff; color: #0f172a; }
+        input:focus, textarea:focus, select:focus { border-color: #14b890 !important; box-shadow: 0 0 0 3px rgba(20,184,144,0.15); }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
       `}</style>
 
       <nav style={s.nav}>
@@ -679,8 +694,8 @@ export default function DashboardResident() {
         </div>
 
         {isMobile ? (
-          <button style={s.hamburger} onClick={() => setMenuOpen(v => !v)} aria-label="Menu">
-            {menuOpen ? '✕' : '☰'}
+          <button style={{ ...s.hamburger, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setMenuOpen(v => !v)} aria-label="Menu" aria-expanded={menuOpen}>
+            {menuOpen ? <CloseIcon /> : <MenuIcon />}
           </button>
         ) : (
           TABS.map(tab => (
@@ -696,7 +711,7 @@ export default function DashboardResident() {
 
         <span style={s.navSep} />
         {!isMobile && (
-          <span style={{ fontSize: 12, color: '#a5b4fc', background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: 6, padding: '3px 10px', marginRight: 8, flexShrink: 0, whiteSpace: 'nowrap' }}>
+          <span style={{ fontSize: 12, fontWeight: '600', color: '#0c7860', background: '#ecfdf7', border: '1px solid #a6f2da', borderRadius: 6, padding: '3px 10px', marginRight: 8, flexShrink: 0, whiteSpace: 'nowrap' }}>
             {residentInfo?.residence_nom ? `Résidence : ${residentInfo.residence_nom}` : 'Aucune résidence assignée'}
           </span>
         )}
@@ -720,13 +735,13 @@ export default function DashboardResident() {
 
       <div style={s.section}>
         {residentInfo !== null && !residentInfo.residence_id && (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.3)', borderRadius: 12, padding: '14px 20px', marginBottom: 20 }}>
-            <span style={{ fontSize: 14, color: '#a5b4fc' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, background: '#ecfdf7', border: '1px solid #a6f2da', borderRadius: 12, padding: '14px 20px', marginBottom: 20 }}>
+            <span style={{ fontSize: 14, color: '#0c7860', fontWeight: '600' }}>
               Vous n'êtes assigné à aucune résidence.
             </span>
             <button
               onClick={() => navigate('/join-residence')}
-              style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 2px 10px rgba(99,102,241,0.35)', whiteSpace: 'nowrap' }}
+              style={{ background: 'linear-gradient(135deg, #14b890, #0c9576)', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 14px rgba(20,184,144,0.28)', whiteSpace: 'nowrap' }}
             >
               Rejoindre une résidence →
             </button>
