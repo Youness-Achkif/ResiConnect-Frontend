@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button, Card } from '../components/ui';
 import './LandingPage.css';
@@ -59,7 +59,7 @@ function SmartImg({ src, alt, className, onMissing = null }) {
 const FEATURES = [
   { icon: Building,       title: 'Gestion multi-résidences',       desc: "Pilotez plusieurs résidences depuis un seul espace : bâtiments, appartements et résidents centralisés." },
   { icon: UserPlus,       title: 'Inscription & demandes d’adhésion', desc: "Les résidents rejoignent leur résidence par code ou recherche ; le gestionnaire valide chaque demande." },
-  { icon: QrCode,         title: 'Contrôle d’accès par QR Code',   desc: "Générez des QR codes d’accès pour vos visiteurs, vérifiés à l’entrée par l’agent de sécurité.", image: '/assets/landing/qr-feature.jpg' },
+  { icon: QrCode,         title: 'Contrôle d’accès par QR Code',   desc: "Générez des QR codes d’accès pour vos visiteurs, vérifiés à l’entrée par l’agent de sécurité.", image: '/assets/landing/qr-feature.png' },
   { icon: MessageSquare,  title: 'Messagerie intégrée',            desc: "Une messagerie directe entre résidents et gestionnaire pour un suivi clair des échanges." },
   { icon: Wallet,         title: 'Paiements & problèmes',          desc: "Suivez les paiements et signalez les problèmes (avec photo), du signalement à la résolution." },
 ];
@@ -70,13 +70,65 @@ const STEPS = [
   { title: 'Tout se gère en ligne', desc: 'Visiteurs, paiements, problèmes et messages : le quotidien résidentiel au même endroit.' },
 ];
 
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined'
+  && window.matchMedia
+  && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 export default function LandingPage() {
   const navigate = useNavigate();
+  const [scrolled, setScrolled] = useState(false);
+  const visualRef = useRef(null);
+
+  // 1. Apparition au scroll via IntersectionObserver natif
+  useEffect(() => {
+    const els = document.querySelectorAll('.lp .reveal');
+    if (prefersReducedMotion() || !('IntersectionObserver' in window)) {
+      els.forEach((el) => el.classList.add('visible'));
+      return undefined;
+    }
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            obs.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -8% 0px' }
+    );
+    els.forEach((el) => obs.observe(el));
+    return () => obs.disconnect();
+  }, []);
+
+  // 4. Ombre douce de la navbar selon le scroll
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // 3. Tilt 3D léger de l'image hero (suit le curseur)
+  const handleTilt = useCallback((e) => {
+    const el = visualRef.current;
+    if (!el || prefersReducedMotion()) return;
+    const r = el.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - 0.5;   // -0.5 → 0.5
+    const py = (e.clientY - r.top) / r.height - 0.5;
+    const max = 7; // degrés max
+    el.style.transform = `rotateY(${px * max}deg) rotateX(${-py * max}deg)`;
+  }, []);
+  const resetTilt = useCallback(() => {
+    const el = visualRef.current;
+    if (el) el.style.transform = '';
+  }, []);
 
   return (
     <div className="lp">
       {/* ── Navbar ── */}
-      <header className="lp-nav">
+      <header className={`lp-nav${scrolled ? ' lp-nav--scrolled' : ''}`}>
         <div className="lp-nav__inner">
           <Link to="/" className="lp-brand">
             <span className="lp-brand__icon">
@@ -105,11 +157,11 @@ export default function LandingPage() {
             <Button size="lg" variant="ghost" onClick={() => navigate('/login')}>Se connecter</Button>
           </div>
         </div>
-        <div className="lp-hero__visual">
-          <div className="lp-visual">
+        <div className="lp-hero__visual" onMouseMove={handleTilt} onMouseLeave={resetTilt}>
+          <div className="lp-visual" ref={visualRef}>
             <div className="lp-visual__fallback"><Building2 size={76} /></div>
             <SmartImg
-              src="/assets/landing/hero.jpg"
+              src="/assets/landing/hero.png"
               alt="Résidence gérée avec ResiConnect"
               className="lp-visual__img"
             />
@@ -118,7 +170,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Fonctionnalités ── */}
-      <section className="lp-container lp-section" id="fonctionnalites">
+      <section className="lp-container lp-section reveal" id="fonctionnalites">
         <div className="lp-sec-head">
           <span className="lp-eyebrow">Fonctionnalités</span>
           <h2 className="lp-h2">Tout ce qu’il faut pour gérer une résidence</h2>
@@ -141,13 +193,13 @@ export default function LandingPage() {
       </section>
 
       {/* ── Comment ça marche ── */}
-      <section className="lp-container lp-section" id="comment">
+      <section className="lp-container lp-section reveal" id="comment">
         <div className="lp-sec-head">
           <span className="lp-eyebrow">Comment ça marche</span>
           <h2 className="lp-h2">Trois étapes, c’est tout</h2>
         </div>
         <div className="lp-steps-wrap">
-          <SmartImg src="/assets/landing/lobby.jpg" alt="" className="lp-steps-bg" />
+          <SmartImg src="/assets/landing/lobby.png" alt="" className="lp-steps-bg" />
           <div className="lp-steps-overlay" />
           <div className="lp-steps">
             {STEPS.map((step, i) => (
@@ -162,7 +214,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── CTA finale ── */}
-      <section className="lp-container lp-section" style={{ paddingTop: 8 }}>
+      <section className="lp-container lp-section reveal" style={{ paddingTop: 8 }}>
         <div className="lp-cta">
           <h2 className="lp-cta__title">Prêt à simplifier votre résidence ?</h2>
           <p className="lp-cta__sub">Créez votre espace en quelques minutes, sans engagement.</p>

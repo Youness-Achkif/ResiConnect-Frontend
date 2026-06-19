@@ -321,3 +321,48 @@
 @media (min-width: 1000px) {
   .lp-features { grid-template-columns: repeat(3, 1fr); }
 }
+
+/* ====================================================
+   Animations (légères, sans dépendance)
+   ==================================================== */
+
+/* 1. Apparition au scroll (fondu + slide-up) */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.55s ease-out, transform 0.55s ease-out;
+  will-change: opacity, transform;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* 2. Hover cartes : mise à l'échelle de l'icône (l'élévation de la
+      carte vient déjà de rc-card--hover dans ui.css) */
+.lp-feat__icon { transition: transform 0.2s ease, background 0.2s ease; }
+.rc-card--hover:hover .lp-feat__icon { transform: scale(1.08); }
+
+/* 3. Tilt 3D de l'image hero (suit le curseur, retour fluide) */
+.lp-hero__visual { perspective: 900px; }
+.lp-visual {
+  transition: transform 0.25s ease-out, box-shadow 0.25s ease-out;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* 4. Navbar : ombre douce progressive au scroll */
+.lp-nav { transition: box-shadow 0.3s ease, background 0.3s ease; }
+.lp-nav--scrolled { box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08); }
+
+/* 5. Accessibilité : réduire fortement les animations si demandé */
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none;
+  }
+  .lp-visual { transition: none; }
+  .lp-feat__icon { transition: none; }
+  .rc-card--hover:hover .lp-feat__icon { transform: none; }
+}
