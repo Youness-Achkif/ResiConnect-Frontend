@@ -1,13 +1,183 @@
+/* ============================================================
+   ResiConnect — Design Tokens & Base Styles
+   Polices : Plus Jakarta Sans (titres) + Inter (corps)
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* ---------- Couleur primaire : teal "confiance & fraîcheur" ---------- */
+  --rc-primary-50:  #ecfdf7;
+  --rc-primary-100: #d1faec;
+  --rc-primary-200: #a6f2da;
+  --rc-primary-300: #6de4c3;
+  --rc-primary-400: #33cca6;
+  --rc-primary-500: #14b890;   /* couleur de marque principale */
+  --rc-primary-600: #0c9576;   /* hover */
+  --rc-primary-700: #0c7860;
+  --rc-primary-800: #0d5f4e;
+  --rc-primary-900: #0b4d40;
+
+  /* ---------- Secondaire : navy profond (entêtes, surfaces sombres) ---------- */
+  --rc-secondary-500: #1e293b;
+  --rc-secondary-600: #172033;
+  --rc-secondary-700: #0f172a;
+
+  /* ---------- Accent chaud (mises en avant ponctuelles) ---------- */
+  --rc-accent-400: #fbbf64;
+  --rc-accent-500: #f59e0b;
+  --rc-accent-600: #d97706;
+
+  /* ---------- Neutres (slate) ---------- */
+  --rc-bg:          #f5f7fa;   /* fond application */
+  --rc-bg-soft:     #eef2f7;
+  --rc-surface:     #ffffff;   /* cartes, panneaux */
+  --rc-surface-2:   #f1f5f9;   /* surface secondaire */
+  --rc-border:      #e2e8f0;
+  --rc-border-strong: #cbd5e1;
+
+  --rc-text:        #0f172a;   /* texte principal */
+  --rc-text-muted:  #475569;   /* texte secondaire */
+  --rc-text-subtle: #64748b;   /* texte discret */
+  --rc-text-invert: #f8fafc;   /* texte sur fond sombre */
+
+  /* ---------- Couleurs sémantiques ---------- */
+  --rc-success:     #16a34a;
+  --rc-success-bg:  #dcfce7;
+  --rc-success-text:#15803d;
+
+  --rc-error:       #dc2626;
+  --rc-error-bg:    #fee2e2;
+  --rc-error-text:  #b91c1c;
+
+  --rc-warning:     #d97706;
+  --rc-warning-bg:  #fef3c7;
+  --rc-warning-text:#b45309;
+
+  --rc-info:        #2563eb;
+  --rc-info-bg:     #dbeafe;
+  --rc-info-text:   #1d4ed8;
+
+  /* ---------- Échelle d'espacement (base 4px) ---------- */
+  --rc-space-1: 4px;
+  --rc-space-2: 8px;
+  --rc-space-3: 12px;
+  --rc-space-4: 16px;
+  --rc-space-5: 20px;
+  --rc-space-6: 24px;
+  --rc-space-8: 32px;
+  --rc-space-10: 40px;
+  --rc-space-12: 48px;
+  --rc-space-16: 64px;
+
+  /* ---------- Rayons de bordure ---------- */
+  --rc-radius-sm: 8px;
+  --rc-radius-md: 12px;
+  --rc-radius-lg: 16px;
+  --rc-radius-xl: 24px;
+  --rc-radius-full: 999px;
+
+  /* ---------- Ombres ---------- */
+  --rc-shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --rc-shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --rc-shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08), 0 2px 4px rgba(15, 23, 42, 0.04);
+  --rc-shadow-lg: 0 12px 28px rgba(15, 23, 42, 0.12), 0 4px 8px rgba(15, 23, 42, 0.05);
+  --rc-shadow-xl: 0 24px 56px rgba(15, 23, 42, 0.18);
+  --rc-shadow-primary: 0 8px 24px rgba(20, 184, 144, 0.30);
+
+  /* ---------- Typographie ---------- */
+  --rc-font-heading: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --rc-font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', 'Roboto', sans-serif;
+
+  /* ---------- Z-index ---------- */
+  --rc-z-dropdown: 100;
+  --rc-z-sticky: 200;
+  --rc-z-overlay: 900;
+  --rc-z-modal: 1000;
+  --rc-z-toast: 1100;
+}
+
+/* ---------- Reset léger ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: var(--rc-font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--rc-text);
+  background-color: var(--rc-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--rc-font-heading);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+a {
+  color: var(--rc-primary-600);
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* ---------- Focus visible accessible ---------- */
+:focus-visible {
+  outline: 2px solid var(--rc-primary-500);
+  outline-offset: 2px;
+}
+
+/* ---------- Scrollbar discrète ---------- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--rc-border-strong) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--rc-border-strong);
+  border-radius: var(--rc-radius-full);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+/* ---------- Animations utilitaires ---------- */
+@keyframes rc-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes rc-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes rc-slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }
