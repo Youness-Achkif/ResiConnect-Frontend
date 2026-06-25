@@ -1,89 +1,173 @@
-<<<<<<< HEAD
-# React + Vite
+# ResiConnect Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Site en production: [https://resiconnect.app/](https://resiconnect.app/)
 
-Currently, two official plugins are available:
+ResiConnect est une application web de gestion de résidences pensée pour centraliser les échanges entre gestionnaires, résidents et agents de sécurité. Le frontend expose les principaux parcours métier: connexion, inscription, demande d’adhésion, dashboards par rôle, gestion des paiements, tickets, annonces, déclaration de problèmes avec photo et contrôle d’accès QR code.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## À Propos Du Projet
 
-## React Compiler
+ResiConnect a été conçu pour simplifier la gestion quotidienne de plusieurs résidences dans une même plateforme. Le projet facilite la communication entre le gestionnaire et les résidents, organise les demandes d’adhésion, structure le suivi des paiements, permet aux résidents de déclarer un problème avec photo, et centralise les tickets, les annonces et le contrôle d’accès des visiteurs.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+L’objectif principal est de proposer une expérience claire et pratique pour deux profils: le gestionnaire, qui pilote les résidences et les opérations, et le résident, qui accède à ses informations, ses demandes et ses échanges dans un espace dédié.
 
-## Expanding the ESLint configuration
+## En Bref
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-=======
-# Getting Started with Create React App
+- Application React avec navigation par rôles `gestionnaire` et `resident`.
+- Sélecteur de résidence persistant côté gestionnaire.
+- Parcours d’onboarding résident avec recherche de résidence et demande d’adhésion.
+- Espace gestionnaire pour suivre les paiements, les tickets et les annonces.
+- Espace résident pour consulter son historique de paiements, ouvrir des tickets, suivre les annonces et gérer ses visiteurs.
+- Contrôle d’accès QR code avec scanner caméra navigateur.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Objectif Du Projet
 
-## Available Scripts
+1. Le projet résout un vrai cas métier: gérer plusieurs résidences et plusieurs profils utilisateurs dans une seule interface.
+2. L’architecture frontend est organisée par responsabilités: pages, composants UI, contextes globaux et services API.
+3. L’expérience a été pensée pour deux publics: le résident et le gestionnaire.
+4. Le contrôle d’accès QR code ajoute une dimension opérationnelle concrète au produit.
 
-In the project directory, you can run:
+## Fonctionnalités Clés
 
-### `npm start`
+- Authentification avec redirection selon le rôle utilisateur.
+- Inscription gestionnaire et inscription résident.
+- Recherche de résidence par nom ou code.
+- Demande d’adhésion à une résidence avec sélection d’appartement.
+- Dashboard résident avec paiements, tickets et annonces.
+- Dashboard gestionnaire avec paiements, tickets, annonces, suivi des résidents et traitement des problèmes.
+- Déclaration de problème par le résident avec photo et description.
+- Mise à jour du statut d’un problème par le gestionnaire: ouvert, en cours ou résolu.
+- Historique des paiements consultable par le résident.
+- Consultation des annonces publiées par le gestionnaire.
+- Ajout et gestion de visiteurs par le résident.
+- Scan de QR code via caméra navigateur avec `html5-qrcode`.
+- Génération de QR code avec `qrcode.react`.
+- Persistance locale de l’utilisateur, du token et de la résidence sélectionnée.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Fonctionnalités Par Rôle
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Résident
 
-### `npm test`
+- Consulter son historique de paiements.
+- Suivre les annonces publiées par le gestionnaire.
+- Déclarer un problème avec photo et description.
+- Suivre le statut d’un problème: ouvert, en cours ou résolu.
+- Ajouter et gérer des visiteurs.
+- Accéder à son espace personnel après authentification.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Gestionnaire
 
-### `npm run build`
+- Gérer plusieurs résidences, bâtiments et appartements.
+- Valider ou suivre les demandes d’adhésion.
+- Consulter et traiter les problèmes déclarés par les résidents.
+- Mettre à jour le statut d’un problème.
+- Suivre les paiements et les tickets.
+- Publier des annonces à destination des résidents.
+- Gérer les résidences depuis un dashboard centralisé.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## User Story - Déclaration De Problème Résident
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Problème Résolu
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Quand un résident rencontre un incident dans son logement, comme une fuite d’eau ou une panne, il doit pouvoir le signaler simplement avec des preuves visuelles. Cela aide le gestionnaire à mieux comprendre la situation et à prioriser l’intervention.
 
-### `npm run eject`
+### Fonctionnement
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+1. Le résident se connecte à son espace.
+2. Il crée une déclaration de problème avec une description.
+3. Il ajoute une photo pour illustrer la situation.
+4. Le gestionnaire consulte la demande dans son dashboard.
+5. Le gestionnaire met à jour le statut du problème: ouvert, en cours ou résolu.
+6. Le résident peut suivre l’évolution de son signalement.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Améliorations Possibles
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+- Catégorisation automatique du problème.
+- Priorité urgente ou normale.
+- Notifications au résident à chaque changement de statut.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## User Story - Gestion Des Visiteurs
 
-## Learn More
+### Fonctionnement
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+1. Le résident ajoute un visiteur depuis son espace.
+2. Il renseigne les informations nécessaires pour l’accès.
+3. Le système prépare l’autorisation ou le QR code associé.
+4. Le résident partage l’accès au visiteur.
+5. Le passage du visiteur peut être enregistré dans l’historique.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Intérêt Produit
 
-### Code Splitting
+Cette fonctionnalité réduit les appels au gardien, sécurise l’entrée des visiteurs et donne au gestionnaire une meilleure visibilité sur les accès.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## User Story - Contrôle D’Accès Par QR Code
 
-### Analyzing the Bundle Size
+### Problème Résolu
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Le gardien reçoit souvent des appels pour autoriser un visiteur: un cousin, un livreur ou un invité annoncé à l’avance. Ce fonctionnement est lent, manuel et peu sécurisé.
 
-### Making a Progressive Web App
+### Fonctionnement
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+1. Le résident se connecte à son espace.
+2. Il crée un visiteur avec un nom, une date, une heure et une durée de validité.
+3. Le système génère un QR code associé à cette visite.
+4. Le QR code est partagé au visiteur.
+5. Au moment de l’arrivée, le gardien scanne le QR code.
+6. Si tout est valide, l’accès est autorisé et l’entrée est enregistrée dans l’historique.
 
-### Advanced Configuration
+### Améliorations Possibles
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+- QR code à usage unique.
+- Détection automatique de plaque d’immatriculation.
+- Notification au résident lorsque le visiteur entre.
 
-### Deployment
+## Stack Technique
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+| Categorie | Technologies |
+| --- | --- |
+| Front-end | HTML, CSS, JavaScript, React |
+| Back-end | Node.js, Express.js |
+| Base de données | PostgreSQL |
+| Stockage fichiers | Cloudinary |
+| Déploiement | Coolify |
+| Dépôts GitHub | `ResiConnect-Frontend` et `ResiConnect-Backend` |
 
-### `npm run build` fails to minify
+- React Router DOM 7
+- Axios
+- `qrcode.react`
+- `html5-qrcode`
+- Create React App via `react-scripts`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
->>>>>>> 2b72b0b48b961df35c287b002bc9682ee65f089b
+## Structure Du Projet
+
+- `src/pages` contient les écrans principaux et les dashboards.
+- `src/components` regroupe les composants réutilisables et les blocs UI.
+- `src/context` gère l’authentification et les données partagées.
+- `src/services` centralise les appels API.
+- `src/styles` contient le thème et les styles globaux.
+
+## Routes Principales
+
+- `/login` pour la connexion.
+- `/register` pour la création de compte.
+- `/resident` pour le dashboard résident.
+- `/manager` pour le dashboard gestionnaire.
+- `/resident/payments`, `/resident/tickets`, `/resident/announcements` pour les vues résidentielles.
+- `/manager/payments`, `/manager/tickets`, `/manager/announcements` pour les vues gestionnaire.
+
+## Installation
+
+1. Installer les dépendances avec `npm install`.
+2. Démarrer le projet avec `npm start`.
+3. Générer le build de production avec `npm run build`.
+
+## Variables D’Environnement
+
+Le frontend consomme l’API via `REACT_APP_API_URL`. Exemple:
+
+```bash
+REACT_APP_API_URL=https://api.resiconnect.app
+```
+
+## Déploiement
+
+Le projet est déployé sur `resiconnect.app`, avec un backend séparé pour l’API et la persistance des données.
