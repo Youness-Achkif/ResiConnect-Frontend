@@ -1,0 +1,368 @@
+/* ============================================================
+   LandingPage — site vitrine public (route "/")
+   100% basé sur les tokens du design system (src/index.css).
+   Mobile-first : styles de base = mobile, media queries = desktop.
+   ============================================================ */
+.lp {
+  font-family: var(--rc-font-body);
+  color: var(--rc-text);
+  background: var(--rc-surface);
+  overflow-x: hidden;
+}
+
+.lp-container {
+  max-width: 1120px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.lp-section { padding: 56px 20px; }
+
+/* ---------------------- Navbar ---------------------- */
+.lp-nav {
+  position: sticky;
+  top: 0;
+  z-index: var(--rc-z-sticky);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--rc-border);
+}
+.lp-nav__inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.lp-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--rc-font-heading);
+  font-weight: 800;
+  font-size: 19px;
+  letter-spacing: -0.02em;
+  color: var(--rc-text);
+  text-decoration: none;
+}
+.lp-brand__icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, var(--rc-primary-500), var(--rc-primary-600));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--rc-shadow-primary);
+  flex-shrink: 0;
+}
+.lp-nav__links { display: flex; align-items: center; gap: 8px; }
+.lp-navlink {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--rc-text-muted);
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: var(--rc-radius-sm);
+  transition: color 0.18s ease, background 0.18s ease;
+  white-space: nowrap;
+}
+.lp-navlink:hover { color: var(--rc-text); background: var(--rc-surface-2); }
+.lp-navlink--hide-sm { display: none; }
+
+/* ---------------------- Hero ---------------------- */
+.lp-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  padding-top: 44px;
+  padding-bottom: 64px;
+}
+.lp-hero__text { flex: 1; min-width: 0; }
+.lp-hero__title {
+  font-family: var(--rc-font-heading);
+  font-weight: 800;
+  font-size: 34px;
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  margin: 0;
+  color: var(--rc-text);
+}
+.lp-hero__title em { color: var(--rc-primary-600); font-style: normal; }
+.lp-hero__sub {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--rc-text-muted);
+  margin: 18px 0 0;
+  max-width: 540px;
+}
+.lp-hero__cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.lp-hero__visual { flex: 1; min-width: 0; }
+
+/* ---------------------- Visual + fallback ---------------------- */
+.lp-visual {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--rc-radius-xl);
+  overflow: hidden;
+  box-shadow: var(--rc-shadow-lg);
+  border: 1px solid var(--rc-border);
+}
+.lp-visual__fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(140deg, var(--rc-primary-400) 0%, var(--rc-primary-700) 100%);
+  color: rgba(255, 255, 255, 0.92);
+}
+.lp-visual__fallback::after {
+  content: '';
+  position: absolute;
+  top: -30%;
+  right: -20%;
+  width: 60%;
+  height: 60%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.18), transparent 70%);
+}
+.lp-visual__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ---------------------- Section heading ---------------------- */
+.lp-sec-head { text-align: center; max-width: 640px; margin: 0 auto 40px; }
+.lp-eyebrow {
+  display: inline-block;
+  font-family: var(--rc-font-heading);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rc-primary-700);
+  background: var(--rc-primary-50);
+  border: 1px solid var(--rc-primary-200);
+  border-radius: var(--rc-radius-full);
+  padding: 5px 13px;
+}
+.lp-h2 {
+  font-family: var(--rc-font-heading);
+  font-weight: 800;
+  font-size: 28px;
+  letter-spacing: -0.02em;
+  margin: 14px 0 0;
+  color: var(--rc-text);
+}
+.lp-sec-head p { margin: 12px 0 0; font-size: 16px; line-height: 1.6; color: var(--rc-text-muted); }
+
+/* ---------------------- Features ---------------------- */
+.lp-features { display: grid; grid-template-columns: 1fr; gap: 18px; }
+.lp-feat {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.lp-feat__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--rc-radius-md);
+  background: var(--rc-primary-50);
+  border: 1px solid var(--rc-primary-200);
+  color: var(--rc-primary-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+.lp-feat__title {
+  font-family: var(--rc-font-heading);
+  font-weight: 700;
+  font-size: 16.5px;
+  margin: 0 0 6px;
+  color: var(--rc-text);
+}
+.lp-feat__desc { font-size: 14px; line-height: 1.6; color: var(--rc-text-muted); margin: 0; }
+.lp-feat__img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--rc-radius-md);
+  border: 1px solid var(--rc-border);
+  margin-top: 14px;
+  display: block;
+}
+
+/* ---------------------- Steps ("Comment ça marche") ---------------------- */
+.lp-steps-wrap {
+  position: relative;
+  border-radius: var(--rc-radius-xl);
+  overflow: hidden;
+  background: linear-gradient(140deg, var(--rc-primary-600) 0%, var(--rc-primary-800) 100%);
+}
+.lp-steps-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.lp-steps-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(140deg, rgba(12, 120, 96, 0.86) 0%, rgba(11, 77, 64, 0.92) 100%);
+}
+.lp-steps {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 28px;
+  padding: 44px 28px;
+}
+.lp-step__num {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  color: #fff;
+  font-family: var(--rc-font-heading);
+  font-weight: 800;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+.lp-step__title {
+  font-family: var(--rc-font-heading);
+  font-weight: 700;
+  font-size: 17px;
+  color: #fff;
+  margin: 0 0 6px;
+}
+.lp-step__desc { font-size: 14px; line-height: 1.6; color: rgba(255, 255, 255, 0.85); margin: 0; }
+
+/* ---------------------- CTA finale ---------------------- */
+.lp-cta {
+  text-align: center;
+  border-radius: var(--rc-radius-xl);
+  padding: 52px 28px;
+  background: linear-gradient(135deg, var(--rc-primary-500) 0%, var(--rc-primary-700) 100%);
+  color: #fff;
+  box-shadow: var(--rc-shadow-lg);
+}
+.lp-cta__title {
+  font-family: var(--rc-font-heading);
+  font-weight: 800;
+  font-size: 27px;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px;
+}
+.lp-cta__sub { font-size: 15.5px; color: rgba(255, 255, 255, 0.9); margin: 0 0 24px; }
+
+/* ---------------------- Footer ---------------------- */
+.lp-footer { border-top: 1px solid var(--rc-border); background: var(--rc-bg); }
+.lp-footer__inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 26px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: center;
+  text-align: center;
+}
+.lp-footer__links { display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; }
+.lp-footer__links a {
+  color: var(--rc-text-muted);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.18s ease;
+}
+.lp-footer__links a:hover { color: var(--rc-primary-600); }
+.lp-copy { color: var(--rc-text-subtle); font-size: 13px; }
+
+/* ====================================================
+   Breakpoints (desktop enhancements)
+   ==================================================== */
+@media (min-width: 560px) {
+  .lp-navlink--hide-sm { display: inline-block; }
+}
+@media (min-width: 640px) {
+  .lp-features { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 900px) {
+  .lp-section { padding: 72px 20px; }
+  .lp-hero {
+    flex-direction: row;
+    align-items: center;
+    gap: 48px;
+    padding-top: 64px;
+    padding-bottom: 88px;
+  }
+  .lp-hero__title { font-size: 46px; }
+  .lp-h2 { font-size: 32px; }
+  .lp-steps { grid-template-columns: repeat(3, 1fr); padding: 52px 40px; gap: 32px; }
+  .lp-cta__title { font-size: 32px; }
+  .lp-footer__inner { flex-direction: row; justify-content: space-between; text-align: left; }
+}
+@media (min-width: 1000px) {
+  .lp-features { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ====================================================
+   Animations (légères, sans dépendance)
+   ==================================================== */
+
+/* 1. Apparition au scroll (fondu + slide-up) */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.55s ease-out, transform 0.55s ease-out;
+  will-change: opacity, transform;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* 2. Hover cartes : mise à l'échelle de l'icône (l'élévation de la
+      carte vient déjà de rc-card--hover dans ui.css) */
+.lp-feat__icon { transition: transform 0.2s ease, background 0.2s ease; }
+.rc-card--hover:hover .lp-feat__icon { transform: scale(1.08); }
+
+/* 3. Tilt 3D de l'image hero (suit le curseur, retour fluide) */
+.lp-hero__visual { perspective: 900px; }
+.lp-visual {
+  transition: transform 0.25s ease-out, box-shadow 0.25s ease-out;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* 4. Navbar : ombre douce progressive au scroll */
+.lp-nav { transition: box-shadow 0.3s ease, background 0.3s ease; }
+.lp-nav--scrolled { box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08); }
+
+/* 5. Accessibilité : réduire fortement les animations si demandé */
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none;
+  }
+  .lp-visual { transition: none; }
+  .lp-feat__icon { transition: none; }
+  .rc-card--hover:hover .lp-feat__icon { transform: none; }
+}

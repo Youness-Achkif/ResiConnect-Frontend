@@ -2,14 +2,27 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import AuthLayout from '../components/AuthLayout';
+import { Button, Input, Callout } from '../components/ui';
+
+const MailIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="2" />
+    <path d="M4 7l8 6 8-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+const LockIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" strokeWidth="2" />
+    <path d="M8 11V8a4 4 0 018 0v3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+  </svg>
+);
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [motDePasse, setMotDePasse] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [focusedField, setFocusedField] = useState(null);
-  const [btnHover, setBtnHover] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -38,249 +51,59 @@ export default function Login() {
     }
   };
 
-  const inputStyle = (field) => ({
-    width: '100%',
-    padding: '13px 16px',
-    background: focusedField === field ? 'rgba(99,102,241,0.08)' : 'rgba(255,255,255,0.04)',
-    border: focusedField === field ? '1.5px solid #6366f1' : '1.5px solid rgba(255,255,255,0.1)',
-    borderRadius: 10,
-    fontSize: 14,
-    color: '#e2e8f0',
-    outline: 'none',
-    boxSizing: 'border-box',
-    transition: 'border-color 0.2s, background 0.2s',
-    fontFamily: 'inherit',
-  });
-
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: 'linear-gradient(135deg, #0f1117 0%, #1a1d27 50%, #0f1117 100%)',
-      padding: 16,
-      boxSizing: 'border-box',
-      fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif",
-      position: 'relative',
-      overflow: 'hidden',
-    }}>
-      {/* Decorative blobs */}
-      <div style={{
-        position: 'absolute',
-        top: '-20%',
-        left: '-10%',
-        width: 500,
-        height: 500,
-        borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%)',
-        pointerEvents: 'none',
-      }} />
-      <div style={{
-        position: 'absolute',
-        bottom: '-20%',
-        right: '-10%',
-        width: 600,
-        height: 600,
-        borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%)',
-        pointerEvents: 'none',
-      }} />
-
-      {/* Card */}
-      <div style={{
-        width: '100%',
-        maxWidth: 420,
-        background: 'rgba(255,255,255,0.05)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        borderRadius: 20,
-        padding: '40px 36px',
-        boxShadow: '0 8px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
-        border: '1px solid rgba(255,255,255,0.1)',
-        boxSizing: 'border-box',
-        position: 'relative',
-        zIndex: 1,
-      }}>
-        {/* Logo area */}
-        <div style={{ textAlign: 'center', marginBottom: 36 }}>
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: 56,
-            height: 56,
-            borderRadius: 16,
-            background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-            marginBottom: 16,
-            boxShadow: '0 4px 20px rgba(99,102,241,0.4)',
-          }}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <polyline points="9,22 9,12 15,12 15,22" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
-          <h1 style={{
-            margin: 0,
-            fontSize: 26,
-            fontWeight: 700,
-            color: '#f1f5f9',
-            letterSpacing: '-0.5px',
-          }}>
-            ResiConnect
-          </h1>
-          <p style={{
-            margin: '6px 0 0',
-            fontSize: 13,
-            color: 'rgba(148,163,184,0.8)',
-            fontWeight: 400,
-          }}>
-            Gestion de résidence simplifiée
-          </p>
+    <AuthLayout>
+      <div className="rc-auth__card">
+        <div className="rc-auth__head">
+          <h2 className="rc-auth__title">Bon retour</h2>
+          <p className="rc-auth__sub">Connectez-vous à votre espace ResiConnect</p>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          {/* Email field */}
+        <form onSubmit={handleSubmit} noValidate>
           <div style={{ marginBottom: 18 }}>
-            <label style={{
-              display: 'block',
-              marginBottom: 8,
-              fontSize: 13,
-              fontWeight: 500,
-              color: 'rgba(203,213,225,0.9)',
-              letterSpacing: '0.2px',
-            }}>
-              Adresse email
-            </label>
-            <input
+            <Input
               type="email"
+              label="Adresse email"
+              icon={<MailIcon />}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              onFocus={() => setFocusedField('email')}
-              onBlur={() => setFocusedField(null)}
               required
+              autoComplete="email"
               placeholder="votre@email.com"
-              style={inputStyle('email')}
             />
           </div>
 
-          {/* Password field */}
-          <div style={{ marginBottom: 24 }}>
-            <label style={{
-              display: 'block',
-              marginBottom: 8,
-              fontSize: 13,
-              fontWeight: 500,
-              color: 'rgba(203,213,225,0.9)',
-              letterSpacing: '0.2px',
-            }}>
-              Mot de passe
-            </label>
-            <input
+          <div style={{ marginBottom: 22 }}>
+            <Input
               type="password"
+              label="Mot de passe"
+              icon={<LockIcon />}
               value={motDePasse}
               onChange={(e) => setMotDePasse(e.target.value)}
-              onFocus={() => setFocusedField('password')}
-              onBlur={() => setFocusedField(null)}
               required
+              autoComplete="current-password"
               placeholder="••••••••"
-              style={inputStyle('password')}
             />
           </div>
 
-          {/* Error message */}
           {error && (
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              background: 'rgba(239,68,68,0.12)',
-              border: '1px solid rgba(239,68,68,0.3)',
-              borderRadius: 8,
-              padding: '10px 14px',
-              marginBottom: 20,
-            }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
-                <circle cx="12" cy="12" r="10" stroke="#ef4444" strokeWidth="2"/>
-                <line x1="12" y1="8" x2="12" y2="12" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/>
-                <line x1="12" y1="16" x2="12.01" y2="16" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-              <p style={{ margin: 0, color: '#fca5a5', fontSize: 13 }}>{error}</p>
+            <div style={{ marginBottom: 20 }}>
+              <Callout variant="error">{error}</Callout>
             </div>
           )}
 
-          {/* Submit button */}
-          <button
-            type="submit"
-            disabled={loading}
-            onMouseEnter={() => setBtnHover(true)}
-            onMouseLeave={() => setBtnHover(false)}
-            style={{
-              width: '100%',
-              padding: '14px',
-              minHeight: 48,
-              background: loading
-                ? 'rgba(99,102,241,0.5)'
-                : btnHover
-                  ? 'linear-gradient(135deg, #5254cc, #7c3aed)'
-                  : 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 10,
-              fontSize: 15,
-              fontWeight: 600,
-              cursor: loading ? 'not-allowed' : 'pointer',
-              fontFamily: 'inherit',
-              letterSpacing: '0.3px',
-              boxShadow: loading || btnHover ? 'none' : '0 4px 20px rgba(99,102,241,0.35)',
-              transition: 'background 0.2s, box-shadow 0.2s, transform 0.1s',
-              transform: btnHover && !loading ? 'translateY(-1px)' : 'none',
-            }}
-          >
-            {loading ? (
-              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ animation: 'spin 1s linear infinite' }}>
-                  <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.3)" strokeWidth="3"/>
-                  <path d="M12 2a10 10 0 0110 10" stroke="#fff" strokeWidth="3" strokeLinecap="round"/>
-                </svg>
-                Connexion…
-              </span>
-            ) : 'Se connecter'}
-          </button>
+          <Button type="submit" variant="primary" size="lg" block loading={loading}>
+            {loading ? 'Connexion…' : 'Se connecter'}
+          </Button>
         </form>
 
-        {/* Register link */}
-        <p style={{ margin: '20px 0 0', textAlign: 'center', fontSize: 13, color: 'rgba(100,116,139,0.9)' }}>
-          Pas encore de compte ?{' '}
-          <a href="/register" style={{ color: '#a5b4fc', textDecoration: 'none', fontWeight: 500 }}>
-            S'inscrire
-          </a>
+        <p className="rc-auth__alt">
+          Pas encore de compte ? <a href="/register">S'inscrire</a>
         </p>
-
-        {/* Scanner link */}
-        <p style={{ margin: '10px 0 0', textAlign: 'center', fontSize: 12, color: 'rgba(100,116,139,0.6)' }}>
-          Agent de sécurité ?{' '}
-          <Link to="/scan" style={{ color: '#94a3b8', textDecoration: 'none', fontWeight: 500 }}>
-            Accéder au scanner QR
-          </Link>
-        </p>
-
-        {/* Footer */}
-        <p style={{
-          margin: '14px 0 0',
-          textAlign: 'center',
-          fontSize: 12,
-          color: 'rgba(100,116,139,0.5)',
-        }}>
-          © {new Date().getFullYear()} ResiConnect — Tous droits réservés
+        <p className="rc-auth__alt rc-auth__alt--sub">
+          Agent de sécurité ? <Link to="/scan">Accéder au scanner QR</Link>
         </p>
       </div>
-
-      {/* Spinner keyframes injected inline */}
-      <style>{`
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        input::placeholder { color: rgba(100,116,139,0.7); }
-      `}</style>
-    </div>
+    </AuthLayout>
   );
 }

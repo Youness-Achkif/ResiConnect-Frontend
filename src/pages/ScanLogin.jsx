@@ -1,13 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ScanCamera from '../components/ScanCamera';
+import AuthLayout from '../components/AuthLayout';
+import { Button, Input, Callout } from '../components/ui';
+
+const SearchIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
+    <line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+  </svg>
+);
+const KeyIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle cx="8" cy="14" r="4" stroke="currentColor" strokeWidth="2" />
+    <path d="M11 11l8-8M16 3l3 3-2 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
 
 export default function ScanLogin() {
   const [code, setCode] = useState('');
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [focusedField, setFocusedField] = useState(null);
-  const [btnHover, setBtnHover] = useState(false);
   const [session, setSession] = useState(null);
   const [suggestions, setSuggestions] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -106,133 +119,80 @@ export default function ScanLogin() {
     );
   }
 
-  const inputStyle = (field) => ({
-    width: '100%',
-    padding: '13px 16px',
-    background: focusedField === field ? 'rgba(99,102,241,0.08)' : 'rgba(255,255,255,0.04)',
-    border: focusedField === field ? '1.5px solid #6366f1' : '1.5px solid rgba(255,255,255,0.1)',
-    borderRadius: 10,
-    fontSize: 14,
-    color: '#e2e8f0',
-    outline: 'none',
-    boxSizing: 'border-box',
-    transition: 'border-color 0.2s, background 0.2s',
-    fontFamily: 'inherit',
-  });
-
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: 'linear-gradient(135deg, #0f1117 0%, #1a1d27 50%, #0f1117 100%)',
-      padding: 16, boxSizing: 'border-box',
-      fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif",
-      position: 'relative', overflow: 'hidden',
-    }}>
-      {/* Decorative blobs */}
-      <div style={{
-        position: 'absolute', top: '-20%', left: '-10%',
-        width: 500, height: 500, borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%)',
-        pointerEvents: 'none',
-      }} />
-      <div style={{
-        position: 'absolute', bottom: '-20%', right: '-10%',
-        width: 600, height: 600, borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%)',
-        pointerEvents: 'none',
-      }} />
-
-      {/* Card */}
-      <div style={{
-        width: '100%', maxWidth: 420,
-        background: 'rgba(255,255,255,0.05)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        borderRadius: 20,
-        padding: '40px 36px',
-        boxShadow: '0 8px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
-        border: '1px solid rgba(255,255,255,0.1)',
-        boxSizing: 'border-box',
-        position: 'relative', zIndex: 1,
-      }}>
-        {/* Logo area */}
-        <div style={{ textAlign: 'center', marginBottom: 36 }}>
+    <AuthLayout
+      tagline="Contrôle d'accès sécurisé."
+      points={[
+        'Vérification instantanée des QR codes',
+        'Accès réservé aux agents autorisés',
+        'Connexion par code résidence + PIN',
+      ]}
+    >
+      <div className="rc-auth__card">
+        <div className="rc-auth__head">
           <div style={{
-            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            width: 56, height: 56, borderRadius: 16,
-            background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-            marginBottom: 16,
-            boxShadow: '0 4px 20px rgba(99,102,241,0.4)',
+            width: 56, height: 56, borderRadius: 16, margin: '0 auto 14px',
+            background: 'linear-gradient(135deg, var(--rc-primary-500), var(--rc-primary-600))',
+            boxShadow: 'var(--rc-shadow-primary)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-              <rect x="3" y="3" width="7" height="7" rx="1" stroke="#fff" strokeWidth="2"/>
-              <rect x="14" y="3" width="7" height="7" rx="1" stroke="#fff" strokeWidth="2"/>
-              <rect x="3" y="14" width="7" height="7" rx="1" stroke="#fff" strokeWidth="2"/>
-              <path d="M14 14h2v2h-2zM18 14h3v2h-3zM14 18h3v3h-3zM19 19h2v2h-2z" fill="#fff"/>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="3" y="3" width="7" height="7" rx="1" stroke="#fff" strokeWidth="2" />
+              <rect x="14" y="3" width="7" height="7" rx="1" stroke="#fff" strokeWidth="2" />
+              <rect x="3" y="14" width="7" height="7" rx="1" stroke="#fff" strokeWidth="2" />
+              <path d="M14 14h2v2h-2zM18 14h3v2h-3zM14 18h3v3h-3zM19 19h2v2h-2z" fill="#fff" />
             </svg>
           </div>
-          <h1 style={{
-            margin: 0, fontSize: 22, fontWeight: 700, color: '#f1f5f9', letterSpacing: '-0.5px',
-          }}>
-            Contrôle d'accès
-          </h1>
-          <p style={{ margin: '6px 0 0', fontSize: 13, color: 'rgba(148,163,184,0.8)', fontWeight: 400 }}>
-            Accès réservé aux agents de sécurité
-          </p>
+          <h2 className="rc-auth__title">Contrôle d'accès</h2>
+          <p className="rc-auth__sub">Accès réservé aux agents de sécurité</p>
         </div>
 
-        <form onSubmit={handleLogin}>
-          {/* Code résidence */}
-          <div style={{ marginBottom: 18 }}>
-            <label style={{
-              display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 500,
-              color: 'rgba(203,213,225,0.9)', letterSpacing: '0.2px',
-            }}>
-              Nom ou code résidence
-            </label>
+        <form onSubmit={handleLogin} noValidate>
+          {/* Code résidence + autocomplétion */}
+          <div className="rc-field" style={{ marginBottom: 18 }}>
+            <label className="rc-field__label" htmlFor="scan-code">Nom ou code résidence</label>
             <div ref={codeContainerRef} style={{ position: 'relative' }}>
-              <input
-                type="text"
-                value={code}
-                onChange={e => setCode(e.target.value)}
-                onFocus={() => {
-                  setFocusedField('code');
-                  if (suggestions.length > 0) setShowDropdown(true);
-                }}
-                onBlur={() => setFocusedField(null)}
-                required
-                placeholder="ex : RC-4829 ou Les Pins"
-                autoComplete="off"
-                style={inputStyle('code')}
-              />
+              <div className="rc-input-wrap rc-input-wrap--icon">
+                <span className="rc-input-wrap__icon" aria-hidden="true"><SearchIcon /></span>
+                <input
+                  id="scan-code"
+                  className="rc-input"
+                  type="text"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  onFocus={() => { if (suggestions.length > 0) setShowDropdown(true); }}
+                  required
+                  placeholder="ex : RC-4829 ou Les Pins"
+                  autoComplete="off"
+                />
+              </div>
               {showDropdown && suggestions.length > 0 && (
                 <div style={{
-                  position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50,
-                  background: '#1a1d27',
-                  border: '1px solid rgba(99,102,241,0.35)',
-                  borderRadius: 10, marginTop: 4,
-                  boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
+                  position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 'var(--rc-z-dropdown)',
+                  background: 'var(--rc-surface)',
+                  border: '1px solid var(--rc-border)',
+                  borderRadius: 'var(--rc-radius-md)', marginTop: 6,
+                  boxShadow: 'var(--rc-shadow-lg)',
                   maxHeight: 220, overflowY: 'auto',
                 }}>
                   {suggestions.map((r, i) => (
                     <div
                       key={r.id}
-                      onMouseDown={e => { e.preventDefault(); handleSelectSuggestion(r); }}
+                      onMouseDown={(e) => { e.preventDefault(); handleSelectSuggestion(r); }}
                       style={{
-                        padding: '10px 14px', cursor: 'pointer',
-                        borderBottom: i < suggestions.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
-                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                        padding: '11px 14px', cursor: 'pointer',
+                        borderBottom: i < suggestions.length - 1 ? '1px solid var(--rc-border)' : 'none',
+                        display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10,
                       }}
-                      onMouseEnter={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.12)'; }}
-                      onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--rc-primary-50)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
                     >
-                      <span style={{ fontSize: 14, color: '#e2e8f0', fontWeight: 500 }}>{r.nom}</span>
+                      <span style={{ fontSize: 14.5, color: 'var(--rc-text)', fontWeight: 500 }}>{r.nom}</span>
                       {r.code && (
                         <span style={{
-                          fontSize: 12, color: '#64748b', fontFamily: 'monospace',
-                          background: 'rgba(255,255,255,0.05)', borderRadius: 5,
-                          padding: '2px 7px', flexShrink: 0, marginLeft: 10,
+                          fontSize: 12, color: 'var(--rc-text-muted)', fontFamily: 'monospace',
+                          background: 'var(--rc-surface-2)', border: '1px solid var(--rc-border)',
+                          borderRadius: 6, padding: '2px 7px', flexShrink: 0,
                         }}>
                           {r.code}
                         </span>
@@ -245,90 +205,35 @@ export default function ScanLogin() {
           </div>
 
           {/* PIN */}
-          <div style={{ marginBottom: 24 }}>
-            <label style={{
-              display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 500,
-              color: 'rgba(203,213,225,0.9)', letterSpacing: '0.2px',
-            }}>
-              PIN
-            </label>
-            <input
+          <div style={{ marginBottom: 22 }}>
+            <Input
+              label="PIN"
+              icon={<KeyIcon />}
               type="password"
               inputMode="numeric"
               pattern="[0-9]{4,6}"
               value={pin}
-              onChange={e => setPin(e.target.value)}
-              onFocus={() => setFocusedField('pin')}
-              onBlur={() => setFocusedField(null)}
+              onChange={(e) => setPin(e.target.value)}
               required
               placeholder="4 à 6 chiffres"
-              style={inputStyle('pin')}
             />
           </div>
 
-          {/* Error */}
           {error && (
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 8,
-              background: 'rgba(239,68,68,0.12)',
-              border: '1px solid rgba(239,68,68,0.3)',
-              borderRadius: 8, padding: '10px 14px', marginBottom: 20,
-            }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
-                <circle cx="12" cy="12" r="10" stroke="#ef4444" strokeWidth="2"/>
-                <line x1="12" y1="8" x2="12" y2="12" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/>
-                <line x1="12" y1="16" x2="12.01" y2="16" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-              <p style={{ margin: 0, color: '#fca5a5', fontSize: 13 }}>{error}</p>
+            <div style={{ marginBottom: 20 }}>
+              <Callout variant="error">{error}</Callout>
             </div>
           )}
 
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={loading}
-            onMouseEnter={() => setBtnHover(true)}
-            onMouseLeave={() => setBtnHover(false)}
-            style={{
-              width: '100%', padding: '14px', minHeight: 48,
-              background: loading
-                ? 'rgba(99,102,241,0.5)'
-                : btnHover
-                  ? 'linear-gradient(135deg, #5254cc, #7c3aed)'
-                  : 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-              color: '#fff', border: 'none', borderRadius: 10,
-              fontSize: 15, fontWeight: 600,
-              cursor: loading ? 'not-allowed' : 'pointer',
-              fontFamily: 'inherit', letterSpacing: '0.3px',
-              boxShadow: loading || btnHover ? 'none' : '0 4px 20px rgba(99,102,241,0.35)',
-              transition: 'background 0.2s, box-shadow 0.2s, transform 0.1s',
-              transform: btnHover && !loading ? 'translateY(-1px)' : 'none',
-            }}
-          >
-            {loading ? (
-              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ animation: 'scan-spin 1s linear infinite' }}>
-                  <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.3)" strokeWidth="3"/>
-                  <path d="M12 2a10 10 0 0110 10" stroke="#fff" strokeWidth="3" strokeLinecap="round"/>
-                </svg>
-                Connexion…
-              </span>
-            ) : 'Accéder au scanner'}
-          </button>
+          <Button type="submit" variant="primary" size="lg" block loading={loading}>
+            {loading ? 'Connexion…' : 'Accéder au scanner'}
+          </Button>
         </form>
 
-        <p style={{
-          margin: '20px 0 0', textAlign: 'center', fontSize: 12,
-          color: 'rgba(100,116,139,0.5)',
-        }}>
+        <p className="rc-auth__foot">
           © {new Date().getFullYear()} ResiConnect — Tous droits réservés
         </p>
       </div>
-
-      <style>{`
-        @keyframes scan-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        input::placeholder { color: rgba(100,116,139,0.7); }
-      `}</style>
-    </div>
+    </AuthLayout>
   );
 }

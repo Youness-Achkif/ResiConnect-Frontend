@@ -5,29 +5,29 @@ import SectionBatiments from './SectionBatiments';
 import SectionAppartements from './SectionAppartements';
 
 const cs = {
-  card:      { background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: 24, marginBottom: 20, boxShadow: '0 4px 30px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)' },
+  card:      { background: '#fff', border: '1px solid #e2e8f0', borderRadius: 16, padding: 24, marginBottom: 20, boxShadow: '0 1px 3px rgba(15,23,42,0.08), 0 1px 2px rgba(15,23,42,0.04)' },
   cardHead:  { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 10 },
-  h2:        { margin: 0, fontSize: 17, fontWeight: '600', color: '#f1f5f9', letterSpacing: '-0.2px' },
-  formPanel: { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: 20, marginBottom: 20 },
+  h2:        { margin: 0, fontSize: 18, fontWeight: '700', color: '#0f172a', letterSpacing: '-0.02em', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" },
+  formPanel: { background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: 20, marginBottom: 20 },
   formRow:   { marginBottom: 14 },
-  lbl:       { display: 'block', marginBottom: 6, fontSize: 13, fontWeight: '500', color: '#94a3b8' },
-  input:     { padding: '10px 14px', border: '1.5px solid rgba(255,255,255,0.1)', borderRadius: 8, fontSize: 14, width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.04)', color: '#e2e8f0', fontFamily: 'inherit', outline: 'none' },
-  btn:       { padding: '8px 14px', minHeight: 36, cursor: 'pointer', borderRadius: 8, border: 'none', fontSize: 13, fontWeight: '500', fontFamily: 'inherit', marginRight: 4 },
-  btnP:      { background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: '#fff', boxShadow: '0 2px 12px rgba(99,102,241,0.3)' },
-  btnD:      { background: 'rgba(239,68,68,0.12)', color: '#fca5a5', border: '1px solid rgba(239,68,68,0.22)' },
-  resCard:   { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: 12, padding: 20, marginBottom: 14 },
-  resName:   { margin: '0 0 6px', fontSize: 16, fontWeight: '600', color: '#f1f5f9' },
+  lbl:       { display: 'block', marginBottom: 6, fontSize: 13, fontWeight: '600', color: '#475569' },
+  input:     { padding: '10px 14px', border: '1.5px solid #cbd5e1', borderRadius: 8, fontSize: 14, width: '100%', boxSizing: 'border-box', background: '#fff', color: '#0f172a', fontFamily: 'inherit', outline: 'none' },
+  btn:       { padding: '8px 14px', minHeight: 36, cursor: 'pointer', borderRadius: 8, border: 'none', fontSize: 13, fontWeight: '600', fontFamily: 'inherit', marginRight: 4 },
+  btnP:      { background: 'linear-gradient(135deg, #14b890, #0c9576)', color: '#fff', boxShadow: '0 4px 14px rgba(20,184,144,0.28)' },
+  btnD:      { background: '#fee2e2', color: '#b91c1c', border: '1px solid #fecaca' },
+  resCard:   { background: '#fff', border: '1px solid #e2e8f0', borderRadius: 14, padding: 20, marginBottom: 14, boxShadow: '0 1px 2px rgba(15,23,42,0.05)' },
+  resName:   { margin: '0 0 6px', fontSize: 16, fontWeight: '700', color: '#0f172a' },
   resAddr:   { margin: 0, fontSize: 13, color: '#64748b' },
   statsRow:  { display: 'flex', gap: 14, flexWrap: 'wrap', marginTop: 14, marginBottom: 14 },
-  stat:      { background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.18)', borderRadius: 8, padding: '8px 14px', textAlign: 'center' },
-  statVal:   { fontSize: 18, fontWeight: '700', color: '#a5b4fc' },
+  stat:      { background: '#ecfdf7', border: '1px solid #a6f2da', borderRadius: 10, padding: '8px 16px', textAlign: 'center' },
+  statVal:   { fontSize: 18, fontWeight: '800', color: '#0c7860' },
   statLbl:   { fontSize: 11, color: '#64748b', marginTop: 2 },
   actRow:    { display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' },
-  expandBtn: { background: 'rgba(255,255,255,0.06)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.1)', padding: '6px 12px', borderRadius: 7, fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', fontWeight: '500' },
-  error:     { color: '#fca5a5', fontSize: 13, margin: '8px 0' },
-  loading:   { color: '#475569', fontSize: 13, margin: '8px 0' },
-  empty:     { color: '#475569', fontSize: 14, padding: '20px 0', textAlign: 'center' },
-  welcome:   { background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.25)', borderRadius: 12, padding: '18px 20px', marginBottom: 20 },
+  expandBtn: { background: '#f1f5f9', color: '#475569', border: '1px solid #e2e8f0', padding: '6px 12px', borderRadius: 8, fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', fontWeight: '600' },
+  error:     { color: '#b91c1c', fontSize: 13, margin: '8px 0' },
+  loading:   { color: '#64748b', fontSize: 13, margin: '8px 0' },
+  empty:     { color: '#64748b', fontSize: 14, padding: '20px 0', textAlign: 'center' },
+  welcome:   { background: '#ecfdf7', border: '1px solid #a6f2da', borderRadius: 12, padding: '18px 20px', marginBottom: 20 },
 };
 
 export default function SectionResidences({ welcomeMode }) {
@@ -138,8 +138,8 @@ export default function SectionResidences({ welcomeMode }) {
 
       {welcomeMode && (
         <div style={cs.welcome}>
-          <p style={{ margin: 0, color: '#a5b4fc', fontWeight: '600', fontSize: 15 }}>Bienvenue sur ResiConnect !</p>
-          <p style={{ margin: '6px 0 0', color: 'rgba(165,180,252,0.7)', fontSize: 13 }}>
+          <p style={{ margin: 0, color: '#0c7860', fontWeight: '700', fontSize: 15 }}>Bienvenue sur ResiConnect !</p>
+          <p style={{ margin: '6px 0 0', color: '#0c9576', fontSize: 13 }}>
             Commencez par créer votre première résidence.
           </p>
         </div>
@@ -178,13 +178,13 @@ export default function SectionResidences({ welcomeMode }) {
 
           {r.code && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-              <span style={{ fontSize: 13, color: '#94a3b8' }}>Code :</span>
-              <span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: '600', color: '#a5b4fc', background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: 6, padding: '3px 10px', letterSpacing: '0.5px' }}>
+              <span style={{ fontSize: 13, color: '#64748b' }}>Code :</span>
+              <span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: '700', color: '#0c7860', background: '#ecfdf7', border: '1px solid #a6f2da', borderRadius: 6, padding: '3px 10px', letterSpacing: '0.5px' }}>
                 {r.code}
               </span>
               <button
                 onClick={() => handleCopy(r.code, r.id)}
-                style={{ padding: '3px 10px', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 6, background: copiedId === r.id ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.06)', color: copiedId === r.id ? '#4ade80' : '#94a3b8', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s' }}
+                style={{ padding: '4px 10px', border: copiedId === r.id ? '1px solid #bbf7d0' : '1px solid #e2e8f0', borderRadius: 6, background: copiedId === r.id ? '#dcfce7' : '#f1f5f9', color: copiedId === r.id ? '#15803d' : '#475569', fontSize: 12, fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s' }}
               >
                 {copiedId === r.id ? 'Copié !' : 'Copier'}
               </button>
@@ -193,19 +193,19 @@ export default function SectionResidences({ welcomeMode }) {
 
           <div style={cs.actRow}>
             <button
-              style={{ ...cs.expandBtn, ...(expandedId === r.id && expandedSection === 'batiments' ? { color: '#a5b4fc', border: '1px solid rgba(99,102,241,0.3)' } : {}) }}
+              style={{ ...cs.expandBtn, ...(expandedId === r.id && expandedSection === 'batiments' ? { color: '#0c7860', border: '1px solid #a6f2da', background: '#ecfdf7' } : {}) }}
               onClick={() => toggleExpand(r.id, 'batiments')}
             >
               {expandedId === r.id && expandedSection === 'batiments' ? '▾' : '▸'} Bâtiments
             </button>
             <button
-              style={{ ...cs.expandBtn, ...(expandedId === r.id && expandedSection === 'appartements' ? { color: '#a5b4fc', border: '1px solid rgba(99,102,241,0.3)' } : {}) }}
+              style={{ ...cs.expandBtn, ...(expandedId === r.id && expandedSection === 'appartements' ? { color: '#0c7860', border: '1px solid #a6f2da', background: '#ecfdf7' } : {}) }}
               onClick={() => toggleExpand(r.id, 'appartements')}
             >
               {expandedId === r.id && expandedSection === 'appartements' ? '▾' : '▸'} Appartements
             </button>
             <button
-              style={{ ...cs.expandBtn, ...(pinFormId === r.id ? { color: '#fbbf24', border: '1px solid rgba(245,158,11,0.35)' } : {}) }}
+              style={{ ...cs.expandBtn, ...(pinFormId === r.id ? { color: '#b45309', border: '1px solid #fde68a', background: '#fef3c7' } : {}) }}
               onClick={() => togglePinForm(r.id)}
             >
               {pinFormId === r.id ? '▾' : '▸'} PIN gardien
@@ -221,9 +221,9 @@ export default function SectionResidences({ welcomeMode }) {
           {pinFormId === r.id && (
             <form
               onSubmit={e => handlePinSubmit(e, r.id)}
-              style={{ marginTop: 14, padding: '14px 16px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 10 }}
+              style={{ marginTop: 14, padding: '14px 16px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 10 }}
             >
-              <p style={{ margin: '0 0 10px', fontSize: 13, color: '#94a3b8' }}>
+              <p style={{ margin: '0 0 10px', fontSize: 13, color: '#64748b' }}>
                 Définir le PIN d'accès pour les gardiens (4 à 6 chiffres)
               </p>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
@@ -242,7 +242,7 @@ export default function SectionResidences({ welcomeMode }) {
                 </button>
               </div>
               {pinMsg && (
-                <p style={{ margin: '8px 0 0', fontSize: 13, color: pinMsg.type === 'success' ? '#4ade80' : '#fca5a5' }}>
+                <p style={{ margin: '8px 0 0', fontSize: 13, fontWeight: '500', color: pinMsg.type === 'success' ? '#15803d' : '#b91c1c' }}>
                   {pinMsg.text}
                 </p>
               )}

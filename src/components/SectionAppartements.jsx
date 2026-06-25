@@ -4,22 +4,22 @@ import { useAuth } from '../context/AuthContext';
 
 const cs = {
   head:        { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
-  label:       { fontSize: 14, fontWeight: '600', color: '#cbd5e1' },
-  formPanel:   { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, padding: 14, marginBottom: 14 },
+  label:       { fontSize: 14, fontWeight: '700', color: '#0f172a', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" },
+  formPanel:   { background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 10, padding: 14, marginBottom: 14 },
   formRow:     { marginBottom: 10 },
-  lbl:         { display: 'block', marginBottom: 5, fontSize: 12, fontWeight: '500', color: '#94a3b8' },
-  input:       { padding: '9px 12px', border: '1.5px solid rgba(255,255,255,0.1)', borderRadius: 8, fontSize: 13, width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.04)', color: '#e2e8f0', fontFamily: 'inherit', outline: 'none' },
-  select:      { padding: '8px 11px', border: '1.5px solid rgba(255,255,255,0.1)', borderRadius: 8, fontSize: 13, width: '100%', boxSizing: 'border-box', background: '#1a1d27', color: '#e2e8f0', fontFamily: 'inherit', outline: 'none', cursor: 'pointer' },
-  btn:         { padding: '6px 12px', minHeight: 30, cursor: 'pointer', borderRadius: 7, border: 'none', fontSize: 12, fontWeight: '500', fontFamily: 'inherit', marginRight: 4 },
-  btnP:        { background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: '#fff' },
-  btnD:        { background: 'rgba(239,68,68,0.12)', color: '#fca5a5', border: '1px solid rgba(239,68,68,0.22)' },
-  btnAssign:   { background: 'rgba(99,102,241,0.15)', color: '#a5b4fc', border: '1px solid rgba(99,102,241,0.25)' },
+  lbl:         { display: 'block', marginBottom: 5, fontSize: 12.5, fontWeight: '600', color: '#475569' },
+  input:       { padding: '9px 12px', border: '1.5px solid #cbd5e1', borderRadius: 8, fontSize: 13, width: '100%', boxSizing: 'border-box', background: '#fff', color: '#0f172a', fontFamily: 'inherit', outline: 'none' },
+  select:      { padding: '8px 11px', border: '1.5px solid #cbd5e1', borderRadius: 8, fontSize: 13, width: '100%', boxSizing: 'border-box', background: '#fff', color: '#0f172a', fontFamily: 'inherit', outline: 'none', cursor: 'pointer' },
+  btn:         { padding: '6px 12px', minHeight: 30, cursor: 'pointer', borderRadius: 8, border: 'none', fontSize: 12, fontWeight: '600', fontFamily: 'inherit', marginRight: 4 },
+  btnP:        { background: 'linear-gradient(135deg, #14b890, #0c9576)', color: '#fff', boxShadow: '0 4px 14px rgba(20,184,144,0.28)' },
+  btnD:        { background: '#fee2e2', color: '#b91c1c', border: '1px solid #fecaca' },
+  btnAssign:   { background: '#ecfdf7', color: '#0c7860', border: '1px solid #a6f2da' },
   tableWrap:   { overflowX: 'auto' },
   table:       { width: '100%', borderCollapse: 'collapse', fontSize: 13, minWidth: 420 },
-  th:          { textAlign: 'left', padding: '8px 12px', borderBottom: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.02)', fontWeight: '600', color: '#475569', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px' },
-  td:          { padding: '10px 12px', borderBottom: '1px solid rgba(255,255,255,0.05)', verticalAlign: 'middle', color: '#cbd5e1' },
-  error:       { color: '#fca5a5', fontSize: 12, margin: '6px 0' },
-  empty:       { color: '#475569', fontSize: 12, textAlign: 'center', padding: '10px 0' },
+  th:          { textAlign: 'left', padding: '9px 12px', borderBottom: '1px solid #e2e8f0', background: '#f8fafc', fontWeight: '700', color: '#64748b', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.05em' },
+  td:          { padding: '10px 12px', borderBottom: '1px solid #eef2f7', verticalAlign: 'middle', color: '#475569' },
+  error:       { color: '#b91c1c', fontSize: 12, margin: '6px 0' },
+  empty:       { color: '#64748b', fontSize: 12, textAlign: 'center', padding: '10px 0' },
 };
 
 export default function SectionAppartements({ residenceId }) {
@@ -89,7 +89,7 @@ export default function SectionAppartements({ residenceId }) {
   }
 
   return (
-    <div style={{ marginTop: 18, paddingTop: 18, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+    <div style={{ marginTop: 18, paddingTop: 18, borderTop: '1px solid #e2e8f0' }}>
       <div style={cs.head}>
         <span style={cs.label}>Appartements</span>
         <button style={{ ...cs.btn, ...cs.btnP }} onClick={() => setShowForm(v => !v)}>
@@ -132,12 +132,12 @@ export default function SectionAppartements({ residenceId }) {
             <tbody>
               {appartements.map(a => (
                 <tr key={a.id}>
-                  <td style={{ ...cs.td, color: '#f1f5f9', fontWeight: '500' }}>{a.numero}</td>
+                  <td style={{ ...cs.td, color: '#0f172a', fontWeight: '600' }}>{a.numero}</td>
                   <td style={cs.td}>{a.batiment_nom ?? a.batiment?.nom ?? '—'}</td>
                   <td style={cs.td}>
                     {a.resident_nom ?? a.user?.nom
-                      ? <span style={{ color: '#a5b4fc' }}>{a.resident_nom ?? a.user?.nom}</span>
-                      : <span style={{ color: '#475569' }}>Libre</span>}
+                      ? <span style={{ color: '#0c7860', fontWeight: '600' }}>{a.resident_nom ?? a.user?.nom}</span>
+                      : <span style={{ color: '#94a3b8' }}>Libre</span>}
                   </td>
                   <td style={cs.td}>
                     {assigningId === a.id ? (
@@ -150,7 +150,7 @@ export default function SectionAppartements({ residenceId }) {
                           <option value="">— Résident —</option>
                           {residents.map(r => <option key={r.id} value={r.id}>{r.nom}</option>)}
                         </select>
-                        <button style={{ ...cs.btn, background: 'transparent', color: '#64748b', border: '1px solid rgba(255,255,255,0.1)' }} onClick={() => setAssigningId(null)}>✕</button>
+                        <button style={{ ...cs.btn, background: 'transparent', color: '#64748b', border: '1px solid #e2e8f0' }} onClick={() => setAssigningId(null)}>✕</button>
                       </span>
                     ) : (
                       <span style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
